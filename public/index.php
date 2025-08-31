@@ -93,13 +93,13 @@ $router->post('/admin/course/delete', ['CourseManagementController', 'destroy'])
 
 
 // ADMIN - STUDENT
-$router->get('/admin/student', ['UserManagementController', 'students']);
-$router->get('/admin/student/create', ['UserManagementController', 'createStudent']);
-$router->post('/admin/student/create', ['UserManagementController', 'storeUser']);
-$router->get('/admin/student/show/(\d+)', ['UserManagementController', 'show']);
-$router->post('/admin/student/delete', ['UserManagementController', 'destroy']);
-$router->get('/admin/student/update/(\d+)', ['UserManagementController', 'edit']);
-$router->post('/admin/student/update', ['UserManagementController', 'update']);
+$router->get('/admin/student', ['StudentController', 'index']);
+$router->get('/admin/student/create', ['StudentController', 'create']);
+$router->post('/admin/student/create', ['StudentController', 'store']);
+$router->get('/admin/student/show/(\d+)', ['StudentController', 'show']);
+$router->post('/admin/student/delete', ['StudentController', 'destroy']);
+$router->get('/admin/student/update/(\d+)', ['StudentController', 'edit']);
+$router->post('/admin/student/update', ['StudentController', 'update']);
 
 // STUDENT
 $router->get('/student', ['StudentController', 'index']);

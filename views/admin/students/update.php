@@ -96,7 +96,8 @@
                 },
                 error: function (jqXHR) {
                     var res = JSON.parse(jqXHR.responseText)
-                    var toastText = res.error;
+                    console.log(res)
+                    var toastText = res.message;
                     var toastIcon = 'error';
                     generateToast(toastText, toastIcon, 'ERROR');
                 }

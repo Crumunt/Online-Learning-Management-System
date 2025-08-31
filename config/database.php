@@ -193,7 +193,7 @@ class Database
             status ENUM('pending','rejected','approved'),
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP,
-            FOREIGN KEY (user_id) REFERENCES Users(id)
+            FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE CASCADE
         )");
 
         $this->conn->query("CREATE TABLE IF NOT EXISTS Courses(
@@ -218,7 +218,7 @@ class Database
             file_size BIGINT(20),
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP,
-            FOREIGN KEY (course_id) REFERENCES Courses(id)
+            FOREIGN KEY (course_id) REFERENCES Courses(id)  ON DELETE CASCADE
         )");
 
         $this->conn->query("CREATE TABLE IF NOT EXISTS `enrollments` (

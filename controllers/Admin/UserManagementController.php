@@ -1,8 +1,6 @@
 <?php
 declare(strict_types=1);
 
-use function PHPSTORM_META\map;
-
 class UserManagementController extends Controller
 {
 
@@ -59,11 +57,6 @@ class UserManagementController extends Controller
         $this->view('instructors/index', compact('data'));
     }
 
-    private function isAjaxRequest()
-    {
-        return isset($_SERVER['HTTP_X_REQUESTED_WITH']) &&
-            strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
-    }
 
     public function createStudent()
     {
@@ -228,7 +221,6 @@ class UserManagementController extends Controller
 
     public function destroy()
     {
-
         try {
 
             $data = json_decode(file_get_contents("php://input"), true);
