@@ -133,7 +133,7 @@ class UserManagementController extends Controller
             $userId = $this->studentModel->create($userCredentials, $table['user_credentials']);
 
             $userDetails['user_id'] = $userId;
-            $this->studentModel->create($userDetails, 'userdetails');
+            $this->studentModel->create($userDetails, 'user_details');
 
             $this->studentModel->commit();
         } catch (Exception $e) {
@@ -207,7 +207,7 @@ class UserManagementController extends Controller
 
             $this->studentModel->update(['id' => $userID], $userCredentials, $table['user_credentials']);
 
-            $this->studentModel->update(['user_id' => $userID], $userDetails, 'userdetails');
+            $this->studentModel->update(['user_id' => $userID], $userDetails, 'user_details');
 
             $this->studentModel->commit();
             return;

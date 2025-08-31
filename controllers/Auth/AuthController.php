@@ -157,7 +157,7 @@ class AuthController extends Controller
             $userId = $this->authModel->create($userCredentials, 'users');
 
             $userDetails['user_id'] = $userId;
-            $this->authModel->create($userDetails, 'userdetails');
+            $this->authModel->create($userDetails, 'user_details');
 
             $this->authModel->commit();
 

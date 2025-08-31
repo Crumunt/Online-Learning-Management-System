@@ -113,7 +113,7 @@ class StudentController extends Controller
         }
 
         // Fetch course content
-        $contentResult = $this->courseModel->all('coursecontent', '*', ['course_id' => $courseId]);
+        $contentResult = $this->courseModel->all('course_content', '*', ['course_id' => $courseId]);
         $content_data = $contentResult ? $contentResult->fetch_all(MYSQLI_ASSOC) : [];
 
         $course_data = [

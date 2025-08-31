@@ -7,7 +7,7 @@ class Database
     private $servername = 'localhost';
     private $username = 'root';
     private $password = '';
-    private $db_name = 'lms_project_beta';
+    private $db_name = 'lms_project_v2';
     public $res;
     protected $conn;
 
@@ -213,6 +213,9 @@ class Database
             course_id INT,
             title VARCHAR(100) NOT NULL,
             content TEXT NULL,
+            file_path VARCHAR(255),
+            file_type VARCHAR(100),
+            file_size BIGINT(20),
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP,
             FOREIGN KEY (course_id) REFERENCES Courses(id)

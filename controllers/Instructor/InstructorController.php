@@ -170,7 +170,7 @@ class InstructorController extends Controller
         $instructor_id = $_SESSION['user_id'] ?? null;
         $data = $this->courseModel->find((int) $courseId)->fetch_assoc();
         $courseDetails = $this->courseModel->all('course_view', 'enrollments, course_content', ['instructor_id' => $instructor_id, 'id' => $courseId])->fetch_assoc();
-        $courseContent = $this->courseModel->all('coursecontent', 'id, title, file_type', ['course_id' => $courseId]);
+        $courseContent = $this->courseModel->all('course_content', 'id, title, file_type', ['course_id' => $courseId]);
 
         $this->view('courses/content/show', compact('data', 'courseDetails', 'courseContent'));
     }
@@ -199,7 +199,7 @@ class InstructorController extends Controller
             throw new Exception('Course not found', 404);
         }
 
-        $contentResult = $this->courseModel->all('coursecontent', '*', ['course_id' => $courseId]);
+        $contentResult = $this->courseModel->all('course_content', '*', ['course_id' => $courseId]);
         $content_data = $contentResult ? $contentResult->fetch_all(MYSQLI_ASSOC) : [];
 
         $course_data = [
@@ -217,7 +217,7 @@ class InstructorController extends Controller
 
     public function showEditContent($contentId)
     {
-        $contentData = $this->instructorModel->all('coursecontent', '*', ['id' => $contentId])->fetch_assoc();
+        $contentData = $this->instructorModel->all('course_content', '*', ['id' => $contentId])->fetch_assoc();
 
         if (empty($contentData)) {
             throw new InvalidArgumentException('Course Content was not found.');
@@ -337,7 +337,7 @@ class InstructorController extends Controller
 
             $this->courseModel->beginTransaction();
 
-            $this->courseModel->create($data, 'coursecontent');
+            $this->courseModel->create($data, 'course_content');
 
             $this->courseModel->commit();
 
@@ -462,7 +462,7 @@ class InstructorController extends Controller
 
             $this->courseModel->beginTransaction();
 
-            $this->courseModel->update(['id' => $contentId], $data, 'coursecontent');
+            $this->courseModel->update(['id' => $contentId], $data, 'course_content');
 
             $this->courseModel->commit();
 
@@ -497,7 +497,7 @@ class InstructorController extends Controller
             $content_id = $data['table_id'] ?? null;
 
             $this->courseModel->beginTransaction();
-            $this->courseModel->delete(['id' => $content_id], 'coursecontent');
+            $this->courseModel->delete(['id' => $content_id], 'course_content');
             $this->courseModel->commit();
 
             http_response_code(200);
