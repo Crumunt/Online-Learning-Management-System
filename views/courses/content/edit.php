@@ -62,7 +62,7 @@ if (true) {
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="content-title">Content Title <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="content-title" name="title" required
+                                    <input type="text" class="form-control" id="course_name" name="course_name" required
                                         placeholder="Enter content title (e.g., Introduction to HTML)">
                                     <small class="form-text text-muted">Choose a clear, descriptive title for this
                                         content</small>
@@ -498,7 +498,7 @@ if (true) {
             let formData = new FormData(this);
 
             // * SET TINMYCE VAL
-            formData.set('content', content);
+            formData.set('short_description', content);
 
             let fileInput = this.querySelector('input[type="file"]');
             if (fileInput && fileInput.files.length > 0) {

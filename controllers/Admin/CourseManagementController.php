@@ -80,8 +80,8 @@ class CourseManagementController extends Controller
 
         try {
 
-            $requiredFields = ['course_id', 'title', 'description'];
-            $allowedFields = ['title', 'description', 'status', 'difficulty'];
+            $requiredFields = ['course_id', 'course_name', 'short_description'];
+            $allowedFields = ['course_name', 'short_description', 'status', 'difficulty'];
             $data = [];
 
             foreach ($requiredFields as $field) {
@@ -167,9 +167,9 @@ class CourseManagementController extends Controller
     private function validateCourseData($data, $courseId = null)
     {
         if (!$courseId) {
-            $courses = $this->courseModel->all('courses', 'title', ['title' => $data['title']])->num_rows;
+            $courses = $this->courseModel->all('courses', 'course_name', ['course_name' => $data['course_name']])->num_rows;
         } else {
-            $courses = $this->courseModel->all('courses', 'title', ['title' => $data['title']], ['id' => $courseId])->num_rows;
+            $courses = $this->courseModel->all('courses', 'course_name', ['course_name' => $data['course_name']], ['id' => $courseId])->num_rows;
 
         }
 
@@ -183,7 +183,7 @@ class CourseManagementController extends Controller
         $value = trim($value);
 
         switch ($field) {
-            case 'title':
+            case 'course_name':
                 if (strlen($value) > 100) {
                     throw new InvalidArgumentException("Title cannot exceed 100 characters");
                 }
@@ -191,7 +191,7 @@ class CourseManagementController extends Controller
                     throw new InvalidArgumentException("Title must be at least 3 characters");
                 }
                 return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
-            case 'description':
+            case 'short_description':
             case 'content':
                 if (strlen($value) > 250) {
                     throw new InvalidArgumentException("Description cannot exceed 250 characters");

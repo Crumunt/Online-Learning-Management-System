@@ -51,7 +51,7 @@ $course_diff = $data['difficulty'];
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="course-title">Course Title <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="course-title" name="title"
+                                    <input type="text" class="form-control" id="course-title" name="course_name"
                                         value="<?= $data['title'] ?>" required placeholder="Enter course title">
                                     <small class="form-text text-muted">Choose a clear, descriptive title for your
                                         course</small>
@@ -64,7 +64,7 @@ $course_diff = $data['difficulty'];
                                 <div class="form-group">
                                     <label for="course-description">Description <span
                                             class="text-danger">*</span></label>
-                                    <textarea class="form-control" id="course-description" name="description" rows="6"
+                                    <textarea class="form-control" id="course-description" name="short_description" rows="6"
                                         required
                                         placeholder="Describe what students will learn in this course"><?= $data['description'] ?></textarea>
                                     <small class="form-text text-muted">Provide a detailed description of the course
