@@ -69,11 +69,6 @@
                                 </div>
                                 <input type="password" class="form-control form-control-lg" id="password"
                                     name="password" placeholder="Enter a secure password" required>
-                                <div class="input-group-append">
-                                    <button class="btn btn-outline-secondary" type="button" id="togglePassword">
-                                        <i class="fa fa-eye"></i>
-                                    </button>
-                                </div>
                             </div>
                             <div class="invalid-feedback"></div>
                             <small class="text-muted"><i class="fa fa-info-circle me-1"></i>
@@ -82,7 +77,7 @@
 
                         <!-- Confirm Password -->
                         <div class="mb-4">
-                            <label for="confirmPassword" class="form-label fw-semibold">Confirm Password <span
+                            <label for="confirm_password" class="form-label fw-semibold">Confirm Password <span
                                     class="text-danger">*</span></label>
                             <div class="input-group">
                                 <div class="input-group-prepend">
@@ -91,7 +86,7 @@
                                     </span>
                                 </div>
                                 <input type="password" class="form-control form-control-lg rounded-right-pill"
-                                    id="confirmPassword" name="confirmPassword" placeholder="Confirm the password"
+                                    id="confirm_password" name="confirm_password" placeholder="Confirm the password"
                                     required>
                             </div>
                             <div class="invalid-feedback"></div>
@@ -163,9 +158,9 @@
                 error: function (jqXHR) {
                     var res = JSON.parse(jqXHR.responseText)
                     console.log(jqXHR);
-                    var toastText = res.error;
+                    var toastText = res.message;
                     var toastIcon = 'error';
-                    generateToast(toastText, toastIcon, 'ERROR');
+                    generateToast(toastText, toastIcon, res.error);
                 }
             });
         })

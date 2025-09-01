@@ -1,3 +1,9 @@
+<?php
+if(isset($user_id)) {
+    echo "HEHE";
+}
+?>
+
 <div class="container my-5">
     <div class="row justify-content-center">
         <div class="col-lg-8 col-md-10">
@@ -27,7 +33,7 @@
                         <i class="fa fa-arrow-left me-2"></i> Back
                     </button>
                     <div>
-                        <a href="/admin/student/edit/1" class="btn btn-secondary btn-lg rounded-pill shadow-sm">
+                        <a href="/admin/<?= $role ?>/update/<?= $user_id ?>" class="btn btn-secondary btn-lg rounded-pill shadow-sm">
                             <i class="fa fa-edit me-2"></i> Edit
                         </a>
                     </div>

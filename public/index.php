@@ -75,13 +75,13 @@ $router->get('/logout', ['AuthController', 'logout']);
 $router->get('/admin', ['AdminDashboardController', 'index']);
 
 // ADMIN - INSTRUCTOR
-$router->get('/admin/instructor', ['UserManagementController', 'instructors']);
-$router->get('/admin/instructor/create', ['UserManagementController', 'createInstructor']);
-$router->post('/admin/instructor/create', ['UserManagementController', 'storeUser']);
-$router->get('/admin/instructor/show/(\d+)', ['UserManagementController', 'show']);
-$router->get('/admin/instructor/update/(\d+)', ['UserManagementController', 'edit']);
-$router->post('/admin/instructor/update', ['UserManagementController', 'update']);
-$router->post('/admin/instructor/delete', ['UserManagementController', 'destroy']);
+$router->get('/admin/instructor', ['AdminInstructorController', 'index']);
+$router->get('/admin/instructor/create', ['AdminInstructorController', 'create']);
+$router->post('/admin/instructor/create', ['AdminInstructorController', 'store']);
+$router->get('/admin/instructor/show/(\d+)', ['AdminInstructorController', 'show']);
+$router->get('/admin/instructor/update/(\d+)', ['AdminInstructorController', 'edit']);
+$router->post('/admin/instructor/update', ['AdminInstructorController', 'update']);
+$router->post('/admin/instructor/delete', ['AdminInstructorController', 'destroy']);
 
 
 // ADMIN - COURSE
@@ -93,13 +93,13 @@ $router->post('/admin/course/delete', ['CourseManagementController', 'destroy'])
 
 
 // ADMIN - STUDENT
-$router->get('/admin/student', ['StudentController', 'index']);
-$router->get('/admin/student/create', ['StudentController', 'create']);
-$router->post('/admin/student/create', ['StudentController', 'store']);
-$router->get('/admin/student/show/(\d+)', ['StudentController', 'show']);
-$router->post('/admin/student/delete', ['StudentController', 'destroy']);
-$router->get('/admin/student/update/(\d+)', ['StudentController', 'edit']);
-$router->post('/admin/student/update', ['StudentController', 'update']);
+$router->get('/admin/student', ['AdminStudentController', 'index']);
+$router->get('/admin/student/create', ['AdminStudentController', 'create']);
+$router->post('/admin/student/create', ['AdminStudentController', 'store']);
+$router->get('/admin/student/show/(\d+)', ['AdminStudentController', 'show']);
+$router->post('/admin/student/delete', ['AdminStudentController', 'destroy']);
+$router->get('/admin/student/update/(\d+)', ['AdminStudentController', 'edit']);
+$router->post('/admin/student/update', ['AdminStudentController', 'update']);
 
 // STUDENT
 $router->get('/student', ['StudentController', 'index']);

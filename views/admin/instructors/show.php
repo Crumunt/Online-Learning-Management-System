@@ -29,9 +29,10 @@ $fields[] = [
     'icon' => 'calendar-alt'
 ];
 
+
 // * echo yung outer component, kasi tsaka lang naman mag auto echo kapag sa condition na ob_get_level() > 1 (meaning yung component call ay under pa sa isang component call. GETS???? AKO HINDI)
 // * SO BASICALLY COMPONENT CALL SA COMPONENT CALL. NESTED COMPONENT CALL!!!!!!!!!!!!!
-echo component('dashboard/show/card', ['role' => $data['role'], 'status' => $data['status']], function () use ($fields) {
+echo component('dashboard/show/card', ['role' => $data['role'], 'status' => $data['status'], 'user_id' => $data['id']], function () use ($fields) {
     // ? loop through the field array and call the component function per item :>
     foreach ($fields as $field) {
         // ? oh i c-check naman kung yung field array ba ay may laman na slot, isset: naka set ba yung item na 'to

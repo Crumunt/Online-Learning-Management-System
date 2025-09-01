@@ -1,7 +1,8 @@
 <?php
 declare(strict_types=1);
 
-class StudentController extends Controller
+
+class AdminStudentController extends Controller
 {
 	protected Student $studentModel;
 
