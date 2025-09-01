@@ -475,9 +475,10 @@
                 success: function (res) {
                     generateToast(CONFIG.MESSAGES.SUCCESS, CONFIG.TOAST.ICON.SUCCESS);
 
-                    setTimeout(() => {
-                        window.location.href = '/instructor/courses';
-                    }, 3000);
+                    console.log(res)
+                    // setTimeout(() => {
+                    //     window.location.href = '/instructor/courses';
+                    // }, 3000);
                 },
                 error: function (error) {
                     var res = JSON.parse(error.responseText)

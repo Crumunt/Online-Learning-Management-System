@@ -96,8 +96,8 @@ class InstructorController extends Controller
                 exit;
             }
 
-            $requiredFields = ['title', 'description'];
-            $allowedFields = ['title', 'description', 'status'];
+            $requiredFields = ['course_name', 'short_description'];
+            $allowedFields = ['course_name', 'short_description', 'status', 'difficulty'];
             $data = [];
 
             // * VALIDATE REQUIRED FIELDS
@@ -154,9 +154,9 @@ class InstructorController extends Controller
     private function validateCourseData($data, $courseId = null)
     {
         if (!$courseId) {
-            $courses = $this->courseModel->all('courses', 'title', ['title' => $data['title']])->num_rows;
+            $courses = $this->courseModel->all('courses', 'course_name', ['course_name' => $data['course_name']])->num_rows;
         } else {
-            $courses = $this->courseModel->all('courses', 'title', ['title' => $data['title']], ['id' => $courseId])->num_rows;
+            $courses = $this->courseModel->all('courses', 'course_name', ['course_name' => $data['course_name']], ['id' => $courseId])->num_rows;
 
         }
 
@@ -167,12 +167,33 @@ class InstructorController extends Controller
 
     public function show($courseId)
     {
-        $instructor_id = $_SESSION['user_id'] ?? null;
-        $data = $this->courseModel->find((int) $courseId)->fetch_assoc();
-        $courseDetails = $this->courseModel->all('course_view', 'enrollments, course_content', ['instructor_id' => $instructor_id, 'id' => $courseId])->fetch_assoc();
-        $courseContent = $this->courseModel->all('course_content', 'id, title, file_type', ['course_id' => $courseId]);
+        try {
+            $instructor_id = $_SESSION['user_id'] ?? null;
+            if (!$instructor_id) {
+                throw new Exception('Invalid user.');
+            }
 
-        $this->view('courses/content/show', compact('data', 'courseDetails', 'courseContent'));
+            $data = null;
+            $courseDetails = null;
+            $courseContent = [];
+
+            $courseResult = $this->courseModel->find((int) $courseId);
+            $data = ($courseResult && $courseResult->num_rows > 0) ? $courseResult->fetch_assoc() : null;
+
+            $courseDetailsResult = $this->courseModel->all('course_view', 'enrollments, course_content', ['instructor_id' => $instructor_id, 'id' => $courseId]);
+            $courseDetails = ($courseDetailsResult && $courseDetailsResult->num_rows > 0) ? $courseDetailsResult->fetch_assoc() : null;
+
+            $courseContentResult = $this->courseModel->all('course_content', 'id, title, file_type', ['course_id' => $courseId]);
+            if ($courseContentResult && $courseContentResult->num_rows > 0) {
+                while ($row = $courseContentResult->fetch_assoc()) {
+                    $courseContent[] = $row;
+                }
+            }
+
+            $this->view('courses/content/show', compact('data', 'courseDetails', 'courseContent'));
+        } catch (\Throwable $th) {
+            //throw $th;
+        }
     }
 
     public function showEdit($courseId)
@@ -200,19 +221,76 @@ class InstructorController extends Controller
         }
 
         $contentResult = $this->courseModel->all('course_content', '*', ['course_id' => $courseId]);
-        $content_data = $contentResult ? $contentResult->fetch_all(MYSQLI_ASSOC) : [];
+        $contentData = $contentResult ? $contentResult->fetch_all(MYSQLI_ASSOC) : [];
 
-        $course_data = [
-            'course_instructor' => $hasRecord['instructor_name'],
-            'course_title' => $hasRecord['title'],
-            'course_description' => $hasRecord['description'],
-            'course_created_at' => date('M d, Y', strtotime($hasRecord['created_at'])),
-            'student_count' => $hasRecord['enrollments'] ?? 0,
-            'material_count' => $hasRecord['course_content'] ?? 0,
-            'course_status' => $hasRecord['status'],
+        $courseData = $this->processCourseData($hasRecord);
+
+        $contentView = $this->processContentView($contentData);
+
+
+        $this->view('courses/content/show', compact('courseData', 'userRole', 'contentView'));
+    }
+
+    private function processCourseData($courseData)
+    {
+        return [
+            'course_id' => $courseData['id'],
+            'instructor' => $courseData['instructor_name'],
+            'title' => $courseData['title'],
+            'description' => $courseData['description'],
+            'created_at' => date('M d, Y', strtotime($courseData['created_at'])),
+            'student_count' => $courseData['enrollments'] ?? 0,
+            'material_count' => $courseData['course_content'] ?? 0,
+            'status' => $courseData['status'],
         ];
+    }
 
-        $this->view('courses/content/show', compact('content_data', 'course_data'));
+    private function processContentView($contentData)
+    {
+        $validContent = array_filter($contentData, 'is_array');
+
+        $targetID = $this->getTargetContentId();
+
+        $currentContent = $this->findCurrentContent($validContent, $targetID);
+        $contentList = $this->prepareContentList($validContent);
+
+        return [
+            'currentTitle' => $currentContent['title'] ?? null,
+            'filename' => $currentContent['file_name'] ?? null,
+            'contentToShow' => $currentContent,
+            'courseContentList' => $contentList,
+            'hasContent' => !empty($validContent)
+        ];
+    }
+
+    private function getTargetContentId()
+    {
+        return isset($_GET['nextContent']) ? intval($_GET['nextContent']) : null;
+    }
+
+    private function findCurrentContent($validContent, $targetId)
+    {
+        if ($targetId) {
+            // Find the content with matching ID
+            // * SO FOREACH IS MUCH BETTER COMPARED TO ARRAY_FILTER WHEN IT COMES TO SEARCHING FOR A SINGLE DATA
+            foreach ($validContent as $content) {
+                if (isset($content['id']) && $content['id'] === $targetId) {
+                    return $content;
+                }
+            }
+        }
+
+        return reset($validContent) ?: null;
+    }
+
+    private function prepareContentList($validContent)
+    {
+        return array_map(function ($content) {
+            return [
+                'id' => $content['id'] ?? null,
+                'title' => $content['title'] ?? 'Untitled',
+            ];
+        }, $validContent);
     }
 
     public function showEditContent($contentId)
@@ -327,7 +405,7 @@ class InstructorController extends Controller
 
             // VALIDATE AND UPLOAD FILE TO STORAGE
             $file = $this->storeFiles();
-            $data['file_path'] = $file['file_name'];
+            $data['file_name'] = $file['file_name'];
             $data['file_size'] = $file['file_size'];
 
 

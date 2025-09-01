@@ -4,49 +4,6 @@ $status = [
     'pending' => 'success',
     'rejected' => 'danger'
 ];
-
-// * Filter only valid content arrays
-$filteredCourseContent = array_filter($content_data, 'is_array');
-
-$userRole = $_SESSION['user_role'];
-
-$contentToShow = null;
-$filename = null;
-$currentContent = null;
-
-$targetID = isset($_GET['nextContent']) ? intval($_GET['nextContent']) : null;
-
-if ($targetID) {
-    // Find the content with matching ID
-    $matched = array_filter($filteredCourseContent, function ($item) use ($targetID) {
-        return isset($item['id']) && $item['id'] == $targetID;
-    });
-
-
-    $contentToShow = reset($matched) ?: null;
-
-    if (!$contentToShow) {
-        $contentToShow = reset($filteredCourseContent) ?: null;
-    }
-    $currentContent = $contentToShow['title'] ?? null;
-    $filename = $contentToShow['file_path'] ?? null;
-} else {
-    // * DEFAULT TO FIRST COURSE CONTENT
-    $contentToShow = reset($filteredCourseContent) ?: null;
-
-    if ($contentToShow) {
-        $currentContent = $contentToShow['title'] ?? null;
-        $filename = $contentToShow['file_path'] ?? null;
-    }
-}
-
-// Prepare simplified content list for rendering
-$courseContent = array_map(function ($content) {
-    return [
-        'id' => $content['id'] ?? null,
-        'title' => $content['title'] ?? 'Untitled',
-    ];
-}, $filteredCourseContent);
 ?>
 
 <div class="wrapper wrapper-content animated fadeInRight">
@@ -75,18 +32,14 @@ $courseContent = array_map(function ($content) {
                             </a>
                             <?php if (in_array($userRole ?? null, ['instructor', 'admin'])): ?>
                                 <div class="btn-group">
-                                    <a href="/<?= $userRole ?>/courses/update/<?= $content_data[0]['course_id'] ?>"
+                                    <a href="/<?= $userRole ?>/courses/update/<?= $courseData['course_id'] ?>"
                                         class="btn btn-outline-primary btn-sm mr-2">
                                         <i class="fa fa-edit mr-1"></i>Edit Course
                                     </a>
                                     <?php if ($userRole === 'instructor'): ?>
-                                        <a href="/instructor/course/<?= $content_data[0]['course_id'] ?>/content/create"
+                                        <a href="/instructor/course/<?= $courseData['course_id'] ?>/content/create"
                                             class="btn btn-success btn-sm mr-2">
                                             <i class="fa fa-edit mr-1"></i>Create Content
-                                        </a>
-                                        <a href="/instructor/course/content/edit/<?= $contentToShow['id'] ?>"
-                                            class="btn btn-primary btn-sm">
-                                            <i class="fa fa-edit mr-1"></i>Edit Content
                                         </a>
                                     <?php endif; ?>
                                 </div>
@@ -119,7 +72,7 @@ $courseContent = array_map(function ($content) {
                                 <div class="form-group">
                                     <label>Course Title</label>
                                     <div class="form-control-static">
-                                        <h4 class="text-navy mb-2"><?= $course_data['course_title'] ?></h4>
+                                        <h4 class="text-navy mb-2"><?= $courseData['title'] ?></h4>
                                     </div>
                                 </div>
                             </div>
@@ -131,7 +84,7 @@ $courseContent = array_map(function ($content) {
                                     <label>Description</label>
                                     <div class="form-control-static">
                                         <p class="text-muted">
-                                            <?= $course_data['course_description'] ?>
+                                            <?= $courseData['description'] ?>
                                         </p>
                                     </div>
                                 </div>
@@ -144,9 +97,9 @@ $courseContent = array_map(function ($content) {
                                     <label>Status</label>
                                     <div class="form-control-static">
                                         <span
-                                            class="badge badge-<?= $status[$course_data['course_status']] ?? 'approved' ?> badge-pill px-3 py-2">
+                                            class="badge badge-<?= $status[$courseData['status']] ?? 'approved' ?> badge-pill px-3 py-2">
                                             <i
-                                                class="fa fa-check-circle mr-1"></i><?= ucfirst($course_data['course_status']) ?>
+                                                class="fa fa-check-circle mr-1"></i><?= ucfirst($courseData['status']) ?>
                                         </span>
                                     </div>
                                 </div>
@@ -156,7 +109,7 @@ $courseContent = array_map(function ($content) {
                                     <label>Created Date</label>
                                     <div class="form-control-static">
                                         <span class="text-muted">
-                                            <i class="fa fa-calendar mr-1"></i><?= $course_data['course_created_at'] ?>
+                                            <i class="fa fa-calendar mr-1"></i><?= $courseData['created_at'] ?>
                                         </span>
                                     </div>
                                 </div>
@@ -179,7 +132,7 @@ $courseContent = array_map(function ($content) {
                 </div>
                 <div class="ibox-content">
                     <div class="content-description">
-                        <?= htmlspecialchars_decode(stripslashes($contentToShow['content'] ?? 'No content has yet to be made.')) ?>
+                        <?= htmlspecialchars_decode(stripslashes($contentView['contentToShow']['content'] ?? 'No content has yet to be made.')) ?>
                     </div>
                 </div>
             </div>
@@ -190,11 +143,11 @@ $courseContent = array_map(function ($content) {
                     <h5><i class="fa fa-file-pdf mr-2"></i>Course Material</h5>
                 </div>
                 <div class="ibox-content">
-                    <?php if (!empty($contentToShow)): ?>
+                    <?php if (!empty($contentView['contentToShow'])): ?>
                         <div class="pdf-icon-viewer-container text-center py-5">
                             <div class="pdf-preview-card" onclick="openFullPDFViewer()">
                                 <div class="pdf-info">
-                                    <h5 class="mb-2"><?= $contentToShow['title'] ?>.pdf</h5>
+                                    <h5 class="mb-2"><?= $contentView['contentToShow']['title'] ?>.pdf</h5>
                                 </div>
                             </div>
 
@@ -231,7 +184,7 @@ $courseContent = array_map(function ($content) {
                                             <i class="fa fa-users fa-2x"></i>
                                         </div>
                                         <div class="col-8 text-right">
-                                            <span class="h2 font-bold"><?= $course_data['student_count'] ?></span>
+                                            <span class="h2 font-bold"><?= $courseData['student_count'] ?></span>
                                             <div class="font-bold">Students</div>
                                         </div>
                                     </div>
@@ -244,7 +197,7 @@ $courseContent = array_map(function ($content) {
                                             <i class="fa fa-play-circle fa-2x"></i>
                                         </div>
                                         <div class="col-8 text-right">
-                                            <span class="h2 font-bold"><?= $course_data['material_count'] ?></span>
+                                            <span class="h2 font-bold"><?= $courseData['material_count'] ?></span>
                                             <div class="font-bold">Contents</div>
                                         </div>
                                     </div>
@@ -264,17 +217,24 @@ $courseContent = array_map(function ($content) {
                     <div class="content-list">
                         <h6 class="text-muted mb-2">All Course Content:</h6>
                         <div class="list-group list-group-flush">
-                            <?php if (!empty($courseContent)): ?>
-                                <?php foreach ($courseContent as $content): ?>
-                                    <?php if ($currentContent === $content['title']): ?>
+                            <?php if ($contentView['hasContent']): ?>
+                                <?php foreach ($contentView['courseContentList'] as $content): ?>
+                                    <?php if ($contentView['currentTitle'] === $content['title']): ?>
                                         <div class="list-group-item active d-flex justify-content-between align-items-center">
                                             <span><i class="fa fa-file-pdf mr-2"></i><?= $content['title'] ?></span>
                                             <div class="group">
-                                                <i class="fa fa-check-circle text-primary"></i>
+                                                <!-- <i class="fa fa-check-circle text-primary"></i> -->
                                                 <?php if (in_array($userRole, ['instructor', 'admin'])): ?>
-                                                    <button class="btn btn-danger deleteBtn" data-content-id="<?= $content['id'] ?>">
-                                                        <i class="fa fa-trash mr-1"></i> Delete
-                                                    </button>
+                                                    <div class="btn-group">
+                                                        <button class="btn btn-danger deleteBtn mx-1"
+                                                            data-content-id="<?= $content['id'] ?>">
+                                                            <i class="fa fa-trash mr-1"></i> Delete
+                                                        </button>
+                                                        <a href="/instructor/course/content/edit/<?= $contentView['contentToShow']['id'] ?>"
+                                                            class="btn btn-primary btn-sm">
+                                                            <i class="fa fa-edit mr-1"></i>Edit Content
+                                                        </a>
+                                                    </div>
                                                 <?php endif; ?>
                                             </div>
                                         </div>
@@ -298,6 +258,13 @@ $courseContent = array_map(function ($content) {
         </div>
     </div>
 </div>
+
+<?php
+function safeJsonEncode($value, $default = null)
+{
+    return json_encode($value ?? $default);
+}
+?>
 
 <style>
     .breadcrumb {
@@ -329,10 +296,10 @@ $courseContent = array_map(function ($content) {
     };
 
     function openFullPDFViewer() {
-        const instructor = <?= json_encode($course_data['course_instructor']) ?>;
-        const file = <?= json_encode($contentToShow['file_path']) ?>;
+        const instructor = <?= safeJsonEncode($courseData['instructor']) ?>;
+        const file = <?= safeJsonEncode($contentView['filename']) ?>;
 
-        console.log(instructor, file);
+        // console.log(instructor, file);
         const url = `/pdf-serve?instructor=${encodeURIComponent(instructor)}&file=${encodeURIComponent(file)}`;
         window.open(url, '_blank')
     }

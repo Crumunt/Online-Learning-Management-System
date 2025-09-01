@@ -15,8 +15,8 @@
 
                         <!-- Course Title -->
                         <div class="form-group">
-                            <label for="title" class="form-label required">Course Title</label>
-                            <input type="text" class="form-control" id="title" name="title" value=""
+                            <label for="course_name" class="form-label required">Course Title</label>
+                            <input type="text" class="form-control" id="course_name" name="course_name" value=""
                                 placeholder="Enter course title" required>
                             <small class="form-text text-muted">
                                 Choose a clear, descriptive title that tells students what they'll learn.
@@ -26,7 +26,7 @@
                         <!-- Course Description -->
                         <div class="form-group">
                             <label for="description" class="form-label required">Course Description</label>
-                            <textarea class="form-control" id="description" name="description" rows="6" maxlength="250"
+                            <textarea class="form-control" id="description" name="short_description" rows="6" maxlength="250"
                                 placeholder="Describe what students will learn, prerequisites, and course objectives..."
                                 required></textarea>
                             <small class="form-text text-muted">
@@ -43,10 +43,21 @@
                         <input type="hidden" name="status" value="pending">
 
                         <!-- Status Info Alert -->
-                        <div class="alert alert-info" role="alert">
-                            <i class="fa fa-info-circle"></i>
-                            <strong>Course Status:</strong> Your course will be set to <strong>Pending</strong> status
-                            and will require admin approval before being published to students.
+                        <div class="form-group d-flex">
+                            <div class="form-group w-50 pr-2">
+                                <label for="difficulty" class="form-label required">Course Difficulty</label>
+                                <select class="form-control" name="difficulty" id="difficulty">
+                                    <option value="beginner" selected>Beginner</option>
+                                    <option value="intermediate">Intermediate</option>
+                                    <option value="advanced">Advanced</option>
+                                </select>
+                            </div>
+
+                            <div class="alert alert-info w-50 pl-2" role="alert">
+                                <i class="fa fa-info-circle"></i>
+                                <strong>Course Status:</strong> Your course will be set to <strong>Pending</strong>
+                                status and will require admin approval before being published to students.
+                            </div>
                         </div>
 
                         <!-- Form Actions -->
@@ -58,7 +69,7 @@
                                     </button>
                                 </div>
                                 <div class="col-md-6">
-                                    <a href="/instructor/course" class="btn btn-outline-secondary btn-block">
+                                    <a href="/instructor/courses" class="btn btn-outline-secondary btn-block">
                                         <i class="fa fa-times"></i> Cancel
                                     </a>
                                 </div>
@@ -295,7 +306,11 @@
                 data: {
                     ...data_array,
                 },
+                before: function () {
+                    $submitBtn.addClass('loading').prop('disabled', true);
+                },
                 success: function (result) {
+                    console.log(result)
                     var toastText = CONFIG.MESSAGES.CREATED_SUCCESS;
                     var toastIcon = 'success';
                     generateToast(toastText, toastIcon, 'Success');
@@ -308,11 +323,14 @@
                     console.log(res)
                     var toastIcon = 'error';
                     generateToast(toastText, toastIcon, 'ERROR');
+                },
+                complete: function () {
+                    $submitBtn.removeClass('loading').prop('disabled', false);
                 }
             });
 
             // Add loading state
-            $submitBtn.addClass('loading').prop('disabled', true);
+
         });
 
         // Remove validation errors on input

@@ -213,9 +213,10 @@ class Database
             course_id INT,
             title VARCHAR(100) NOT NULL,
             content TEXT NULL,
-            file_path VARCHAR(255),
+            file_name VARCHAR(255),
             file_type VARCHAR(100),
             file_size BIGINT(20),
+            status ENUM('active', 'inactive', 'draft', 'archived'),
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP,
             FOREIGN KEY (course_id) REFERENCES Courses(id)  ON DELETE CASCADE
