@@ -4,17 +4,17 @@ declare(strict_types=1);
 class CourseManagementController extends Controller
 {
 
-    protected Course $courseModel;
+    protected Course $course;
 
     public function __construct()
     {
         parent::__construct();
-        $this->courseModel = new Course();
+        $this->course = new Course();
     }
 
     public function index()
     {
-        $data = $this->courseModel->all();
+        $data = $this->course->all();
 
         if ($this->isAjaxRequest()) {
             $datas = [];
@@ -33,13 +33,13 @@ class CourseManagementController extends Controller
     {
 
         // CHECK IF HAS COURSE
-        $hasRecord = $this->courseModel->all('course_view', '*', ['id' => $courseId])->fetch_assoc();
+        $hasRecord = $this->course->all('course_view', '*', ['id' => $courseId])->fetch_assoc();
 
         if (!$hasRecord) {
             throw new Exception('Course not found', 404);
         }
 
-        $contentResult = $this->courseModel->all('course_content', '*', ['course_id' => $courseId]);
+        $contentResult = $this->course->all('course_content', '*', ['course_id' => $courseId]);
         $content_data = $contentResult ? $contentResult->fetch_all(MYSQLI_ASSOC) : [];
 
         $course_data = [
@@ -66,12 +66,12 @@ class CourseManagementController extends Controller
                 throw new Exception('Unauthorized');
             }
 
-            $data = $this->courseModel->find((int) $courseId)->fetch_assoc();
+            $data = $this->course->find((int) $courseId)->fetch_assoc();
             $this->view('courses/edit', compact('data'));
         } catch (Exception $e) {
             throw new Exception('Invalid action.');
         }
-        // $data = $this->courseModel->find((int) $id)->fetch_assoc();
+        // $data = $this->course->find((int) $id)->fetch_assoc();
         // $this->view('admin/courses/update', compact('data'));
     }
 
@@ -107,17 +107,17 @@ class CourseManagementController extends Controller
             $course_id = $this->validateAndSanitizeField('course_id', $_POST['course_id']);
             $this->validateCourseData($data, $course_id);
 
-            $this->courseModel->beginTransaction();
+            $this->course->beginTransaction();
 
-            $courseId = $this->courseModel->update(['id' => $course_id], $data, 'courses');
+            $courseId = $this->course->update(['id' => $course_id], $data, 'courses');
 
             if (!$course_id) {
                 throw new Exception("Failed to update course");
             }
 
-            $this->courseModel->commit();
+            $this->course->commit();
         } catch (InvalidArgumentException $e) {
-            $this->courseModel->rollback();
+            $this->course->rollback();
             http_response_code(400); // Bad Request
             echo json_encode([
                 'error' => 'Validation Error',
@@ -125,7 +125,7 @@ class CourseManagementController extends Controller
             ]);
             exit;
         } catch (Exception $e) {
-            $this->courseModel->rollback();
+            $this->course->rollback();
             http_response_code(500); // Internal Server Error
 
             // Return generic error to client
@@ -146,14 +146,14 @@ class CourseManagementController extends Controller
             $data = json_decode(file_get_contents("php://input"), true);
             $course_id = $data['table_id'] ?? null;
 
-            $this->courseModel->beginTransaction();
-            $this->courseModel->delete(['id' => $course_id], 'courses');
-            $this->courseModel->commit();
+            $this->course->beginTransaction();
+            $this->course->delete(['id' => $course_id], 'courses');
+            $this->course->commit();
 
             http_response_code(200);
             echo json_encode(['success' => true]);
         } catch (Exception $e) {
-            $this->courseModel->rollback();
+            $this->course->rollback();
 
             http_response_code(500);
             header('Content-Type: application/json');
@@ -167,9 +167,9 @@ class CourseManagementController extends Controller
     private function validateCourseData($data, $courseId = null)
     {
         if (!$courseId) {
-            $courses = $this->courseModel->all('courses', 'course_name', ['course_name' => $data['course_name']])->num_rows;
+            $courses = $this->course->all('courses', 'course_name', ['course_name' => $data['course_name']])->num_rows;
         } else {
-            $courses = $this->courseModel->all('courses', 'course_name', ['course_name' => $data['course_name']], ['id' => $courseId])->num_rows;
+            $courses = $this->course->all('courses', 'course_name', ['course_name' => $data['course_name']], ['id' => $courseId])->num_rows;
 
         }
 

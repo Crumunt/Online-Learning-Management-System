@@ -12,7 +12,8 @@ class Model
      */
     protected $conn;
     protected $table;
-    protected $view_table;
+    protected $viewTable;
+    protected $primaryKey;
 
     public function __construct()
     {
@@ -32,6 +33,35 @@ class Model
     public function rollback()
     {
         return $this->conn->rollback();
+    }
+
+    public function allv2(?string $table = null, string $columns = "*", ?array $where = null, ?string $orderBy = null, ?int $limit = null)
+    {
+        $table = $table ?? $this->table;
+        return $this->conn->select($table, $columns, $where, null,  $orderBy, $limit);
+    }
+
+    // FETCH USER DATA
+    public function findv2(int $id, string $columns = '*')
+    {
+        $result = $this->conn->select($this->viewTable, $columns, [$this->primaryKey => $id]);
+
+        if ($result && $result->num_rows > 0) {
+            return $result->fetch_assoc();
+        }
+
+        return null;
+    }
+
+    public function findWhere(array $conditions, string $columns = '*')
+    {
+        $result = $this->conn->select($this->table, $columns, $conditions);
+
+        if ($result && $result->num_rows > 0) {
+            return $result->fetch_assoc();
+        }
+
+        return null;
     }
 
     public function all($table = null, $row = "*", $where = NULL, $not = NULL)
@@ -63,6 +93,11 @@ class Model
         $targetTable = $table ?? $this->table;
         return $this->conn->destroy($targetTable, $conditions);
     }
-    
+
+    public function deleteById(int $id): bool
+    {
+        return $this->delete([$this->primaryKey => $id]);
+    }
+
 
 }

@@ -7,15 +7,15 @@ class InstructorController extends Controller
     protected $guestOnly = false;
     protected $allowedRoles = ['instructor'];
 
-    protected Instructor $instructorModel;
-    protected Course $courseModel;
+    protected Course $course;
+    protected User $user;
 
     public function __construct()
     {
         parent::__construct();
 
-        $this->instructorModel = new Instructor();
-        $this->courseModel = new Course();
+        $this->course = new Course();
+        $this->user = new User();
     }
 
     public function index()
@@ -30,7 +30,7 @@ class InstructorController extends Controller
             $this->redirect('/login');
         }
 
-        $course_view_result = $this->instructorModel->all('course_view', 'COUNT(*) AS course_count, SUM(course_content) AS learning_material_count', ['instructor_id' => $instructor_id, 'status' => 'approved'])->fetch_all(MYSQLI_ASSOC);
+        $course_view_result = $this->user->all('course_view', 'COUNT(*) AS course_count, SUM(course_content) AS learning_material_count', ['instructor_id' => $instructor_id, 'status' => 'approved'])->fetch_all(MYSQLI_ASSOC);
         $course_count = 0;
         $learning_material_count = 0;
         if (!empty($course_view_result)) {
@@ -39,7 +39,7 @@ class InstructorController extends Controller
         }
 
 
-        $student_data = $this->instructorModel->all('courses_enrolled', 'student_id, student_name, enrolled_at, title', ['instructor_id' => $instructor_id])->fetch_all(MYSQLI_ASSOC);
+        $student_data = $this->user->all('courses_enrolled', 'student_id, student_name, enrolled_at, title', ['instructor_id' => $instructor_id])->fetch_all(MYSQLI_ASSOC);
         $student_count = count($student_data);
 
         $this->view('dashboard/instructor', compact('course_count', 'student_count', 'learning_material_count', 'student_data'));
@@ -48,7 +48,7 @@ class InstructorController extends Controller
     public function courses()
     {
         $instructor_id = $_SESSION['user_id'] ?? null;
-        $data = $this->courseModel->all('course_view', '*', ['instructor_id' => $instructor_id]);
+        $data = $this->course->all('course_view', '*', ['instructor_id' => $instructor_id]);
 
         if ($this->isAjaxRequest()) {
             $datas = [];
@@ -65,7 +65,7 @@ class InstructorController extends Controller
     public function students()
     {
         $instructor_id = $_SESSION['user_id'] ?? null;
-        $data = $this->courseModel->all('courses_enrolled', '*', ['instructor_id' => $instructor_id]);
+        $data = $this->course->all('courses_enrolled', '*', ['instructor_id' => $instructor_id]);
 
         if ($this->isAjaxRequest()) {
             $datas = [];
@@ -121,17 +121,17 @@ class InstructorController extends Controller
             $this->validateCourseData($data);
             $data['instructor_id'] = $instructor_id;
 
-            $this->courseModel->beginTransaction();
+            $this->course->beginTransaction();
 
-            $courseId = $this->courseModel->create($data, 'courses');
+            $courseId = $this->course->create($data, 'courses');
 
             if (!$courseId) {
                 throw new Exception("Failed to create course");
             }
 
-            $this->courseModel->commit();
+            $this->course->commit();
         } catch (InvalidArgumentException $e) {
-            $this->courseModel->rollback();
+            $this->course->rollback();
             http_response_code(400); // Bad Request
             echo json_encode([
                 'error' => 'Validation Error',
@@ -139,7 +139,7 @@ class InstructorController extends Controller
             ]);
             exit;
         } catch (Exception $e) {
-            $this->courseModel->rollback();
+            $this->course->rollback();
             http_response_code(500); // Internal Server Error
 
             // Return generic error to client
@@ -154,9 +154,9 @@ class InstructorController extends Controller
     private function validateCourseData($data, $courseId = null)
     {
         if (!$courseId) {
-            $courses = $this->courseModel->all('courses', 'course_name', ['course_name' => $data['course_name']])->num_rows;
+            $courses = $this->course->all('courses', 'course_name', ['course_name' => $data['course_name']])->num_rows;
         } else {
-            $courses = $this->courseModel->all('courses', 'course_name', ['course_name' => $data['course_name']], ['id' => $courseId])->num_rows;
+            $courses = $this->course->all('courses', 'course_name', ['course_name' => $data['course_name']], ['id' => $courseId])->num_rows;
 
         }
 
@@ -177,13 +177,13 @@ class InstructorController extends Controller
             $courseDetails = null;
             $courseContent = [];
 
-            $courseResult = $this->courseModel->find((int) $courseId);
+            $courseResult = $this->course->find((int) $courseId);
             $data = ($courseResult && $courseResult->num_rows > 0) ? $courseResult->fetch_assoc() : null;
 
-            $courseDetailsResult = $this->courseModel->all('course_view', 'enrollments, course_content', ['instructor_id' => $instructor_id, 'id' => $courseId]);
+            $courseDetailsResult = $this->course->all('course_view', 'enrollments, course_content', ['instructor_id' => $instructor_id, 'id' => $courseId]);
             $courseDetails = ($courseDetailsResult && $courseDetailsResult->num_rows > 0) ? $courseDetailsResult->fetch_assoc() : null;
 
-            $courseContentResult = $this->courseModel->all('course_content', 'id, title, file_type', ['course_id' => $courseId]);
+            $courseContentResult = $this->course->all('course_content', 'id, title, file_type', ['course_id' => $courseId]);
             if ($courseContentResult && $courseContentResult->num_rows > 0) {
                 while ($row = $courseContentResult->fetch_assoc()) {
                     $courseContent[] = $row;
@@ -199,7 +199,7 @@ class InstructorController extends Controller
     public function showEdit($courseId)
     {
         $instructor_id = $_SESSION['user_id'] ?? null;
-        $data = $this->courseModel->find((int) $courseId)->fetch_assoc();
+        $data = $this->course->find((int) $courseId)->fetch_assoc();
 
         $this->view('courses/edit', compact('data'));
     }
@@ -214,88 +214,27 @@ class InstructorController extends Controller
         }
 
         // CHECK IF HAS COURSE
-        $hasRecord = $this->courseModel->all('course_view', '*', ['id' => $courseId, 'instructor_id' => $instructorId])->fetch_assoc();
+        $hasRecord = $this->course->all('course_view', '*', ['id' => $courseId, 'instructor_id' => $instructorId])->fetch_assoc();
 
         if (!$hasRecord) {
             throw new Exception('Course not found', 404);
         }
 
-        $contentResult = $this->courseModel->all('course_content', '*', ['course_id' => $courseId]);
+        $contentResult = $this->course->all('course_content', '*', ['course_id' => $courseId]);
         $contentData = $contentResult ? $contentResult->fetch_all(MYSQLI_ASSOC) : [];
 
-        $courseData = $this->processCourseData($hasRecord);
+        $courseData = $this->user->processCourseData($hasRecord);
 
-        $contentView = $this->processContentView($contentData);
+        $contentView = $this->user->processContentView($contentData);
 
 
         $this->view('courses/content/show', compact('courseData', 'userRole', 'contentView'));
     }
 
-    private function processCourseData($courseData)
-    {
-        return [
-            'course_id' => $courseData['id'],
-            'instructor' => $courseData['instructor_name'],
-            'title' => $courseData['title'],
-            'description' => $courseData['description'],
-            'created_at' => date('M d, Y', strtotime($courseData['created_at'])),
-            'student_count' => $courseData['enrollments'] ?? 0,
-            'material_count' => $courseData['course_content'] ?? 0,
-            'status' => $courseData['status'],
-        ];
-    }
-
-    private function processContentView($contentData)
-    {
-        $validContent = array_filter($contentData, 'is_array');
-
-        $targetID = $this->getTargetContentId();
-
-        $currentContent = $this->findCurrentContent($validContent, $targetID);
-        $contentList = $this->prepareContentList($validContent);
-
-        return [
-            'currentTitle' => $currentContent['title'] ?? null,
-            'filename' => $currentContent['file_name'] ?? null,
-            'contentToShow' => $currentContent,
-            'courseContentList' => $contentList,
-            'hasContent' => !empty($validContent)
-        ];
-    }
-
-    private function getTargetContentId()
-    {
-        return isset($_GET['nextContent']) ? intval($_GET['nextContent']) : null;
-    }
-
-    private function findCurrentContent($validContent, $targetId)
-    {
-        if ($targetId) {
-            // Find the content with matching ID
-            // * SO FOREACH IS MUCH BETTER COMPARED TO ARRAY_FILTER WHEN IT COMES TO SEARCHING FOR A SINGLE DATA
-            foreach ($validContent as $content) {
-                if (isset($content['id']) && $content['id'] === $targetId) {
-                    return $content;
-                }
-            }
-        }
-
-        return reset($validContent) ?: null;
-    }
-
-    private function prepareContentList($validContent)
-    {
-        return array_map(function ($content) {
-            return [
-                'id' => $content['id'] ?? null,
-                'title' => $content['title'] ?? 'Untitled',
-            ];
-        }, $validContent);
-    }
 
     public function showEditContent($contentId)
     {
-        $contentData = $this->instructorModel->all('course_content', '*', ['id' => $contentId])->fetch_assoc();
+        $contentData = $this->user->all('course_content', '*', ['id' => $contentId])->fetch_assoc();
 
         if (empty($contentData)) {
             throw new InvalidArgumentException('Course Content was not found.');
@@ -348,17 +287,17 @@ class InstructorController extends Controller
             $course_id = $this->validateAndSanitizeField('course_id', $_POST['course_id']);
             $this->validateCourseData($data, $course_id);
 
-            $this->courseModel->beginTransaction();
+            $this->course->beginTransaction();
 
-            $courseId = $this->courseModel->update(['id' => $course_id], $data, 'courses');
+            $courseId = $this->course->update(['id' => $course_id], $data, 'courses');
 
             if (!$course_id) {
                 throw new Exception("Failed to update course");
             }
 
-            $this->courseModel->commit();
+            $this->course->commit();
         } catch (InvalidArgumentException $e) {
-            $this->courseModel->rollback();
+            $this->course->rollback();
             http_response_code(400); // Bad Request
             echo json_encode([
                 'error' => 'Validation Error',
@@ -366,7 +305,7 @@ class InstructorController extends Controller
             ]);
             exit;
         } catch (Exception $e) {
-            $this->courseModel->rollback();
+            $this->course->rollback();
             http_response_code(500); // Internal Server Error
 
             // Return generic error to client
@@ -413,14 +352,14 @@ class InstructorController extends Controller
                 $data['status'] = 'pending';
             }
 
-            $this->courseModel->beginTransaction();
+            $this->course->beginTransaction();
 
-            $this->courseModel->create($data, 'course_content');
+            $this->course->create($data, 'course_content');
 
-            $this->courseModel->commit();
+            $this->course->commit();
 
         } catch (InvalidArgumentException $e) {
-            $this->courseModel->rollback();
+            $this->course->rollback();
             http_response_code(400); // Bad Request
             echo json_encode([
                 'error' => 'Validation Error',
@@ -428,7 +367,7 @@ class InstructorController extends Controller
             ]);
             exit;
         } catch (Exception $e) {
-            $this->courseModel->rollback();
+            $this->course->rollback();
             http_response_code(500); // Internal Server Error
 
             // Return generic error to client
@@ -538,14 +477,14 @@ class InstructorController extends Controller
 
             $contentId = $_POST['course_id'];
 
-            $this->courseModel->beginTransaction();
+            $this->course->beginTransaction();
 
-            $this->courseModel->update(['id' => $contentId], $data, 'course_content');
+            $this->course->update(['id' => $contentId], $data, 'course_content');
 
-            $this->courseModel->commit();
+            $this->course->commit();
 
         } catch (InvalidArgumentException $e) {
-            $this->courseModel->rollback();
+            $this->course->rollback();
             http_response_code(400); // Bad Request
             echo json_encode([
                 'error' => 'Validation Error',
@@ -554,7 +493,7 @@ class InstructorController extends Controller
             ]);
             exit;
         } catch (Exception $e) {
-            $this->courseModel->rollback();
+            $this->course->rollback();
             http_response_code(500); // Internal Server Error
 
             // Return generic error to client
@@ -574,14 +513,14 @@ class InstructorController extends Controller
             $data = json_decode(file_get_contents("php://input"), true);
             $content_id = $data['table_id'] ?? null;
 
-            $this->courseModel->beginTransaction();
-            $this->courseModel->delete(['id' => $content_id], 'course_content');
-            $this->courseModel->commit();
+            $this->course->beginTransaction();
+            $this->course->delete(['id' => $content_id], 'course_content');
+            $this->course->commit();
 
             http_response_code(200);
             echo json_encode(['success' => true]);
         } catch (Exception $e) {
-            $this->courseModel->rollback();
+            $this->course->rollback();
 
             http_response_code(500);
             header('Content-Type: application/json');

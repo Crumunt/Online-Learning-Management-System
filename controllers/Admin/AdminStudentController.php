@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 class AdminStudentController extends Controller
 {
-	protected Student $studentModel;
+	protected User $user;
 
 	public function __construct()
 	{
 		parent::__construct();
-		$this->studentModel = new Student();
+		$this->user = new User();
 	}
 
 	public function index()
 	{
 		$table = 'student_view';
-		$data = $this->studentModel->all($table, '*');
+		$data = $this->user->all($table, '*');
 
 		if ($this->isAjaxRequest()) {
 			$datas = [];
@@ -46,18 +46,18 @@ class AdminStudentController extends Controller
 				'credentials' => 'users',
 				'details' => 'user_details'
 			];
-			$this->studentModel->beginTransaction();
+			$this->user->beginTransaction();
 
-			$userId = $this->studentModel->create($credentials, $tables['credentials']);
+			$userId = $this->user->create($credentials, $tables['credentials']);
 
 			if (!$userId) {
 				throw new Exception("Failed to create user credentials");
 			}
 
 			$user_details['user_id'] = $userId;
-			$this->studentModel->create($user_details, $tables['details']);
+			$this->user->create($user_details, $tables['details']);
 
-			$this->studentModel->commit();
+			$this->user->commit();
 		} catch (InvalidArgumentException $e) {
 			http_response_code(422);  // * UNRPOCESSABLE ENTITY
 			echo json_encode([
@@ -79,14 +79,14 @@ class AdminStudentController extends Controller
 
 	public function show($student_id)
 	{
-		$data = $this->studentModel->find((int) $student_id)->fetch_assoc();
+		$data = $this->user->find((int) $student_id)->fetch_assoc();
 
 		$this->view('admin/students/show', compact('data'));
 	}
 
 	public function edit($student_id)
 	{
-		$data = $this->studentModel->find((int) $student_id)->fetch_assoc();
+		$data = $this->user->find((int) $student_id)->fetch_assoc();
 		$this->view('admin/students/update', compact('data'));
 	}
 
@@ -102,7 +102,7 @@ class AdminStudentController extends Controller
 				'credentials' => 'users',
 				'details' => 'user_details'
 			];
-			$this->studentModel->beginTransaction();
+			$this->user->beginTransaction();
 
 			$user_id = (int) $_POST['id'];
 
@@ -110,11 +110,11 @@ class AdminStudentController extends Controller
 				throw new Exception("Failed to create user credentials");
 			}
 
-			$this->studentModel->update(['id' => $user_id], $credentials, $tables['credentials']);
+			$this->user->update(['id' => $user_id], $credentials, $tables['credentials']);
 
-			$this->studentModel->update(['user_id' => $user_id], $user_details, $tables['details']);
+			$this->user->update(['user_id' => $user_id], $user_details, $tables['details']);
 
-			$this->studentModel->commit();
+			$this->user->commit();
 		} catch (InvalidArgumentException $e) {
 			http_response_code(422);  // * UNRPOCESSABLE ENTITY
 			echo json_encode([
@@ -141,15 +141,15 @@ class AdminStudentController extends Controller
 			$data = json_decode(file_get_contents("php://input"), true);
 			$userId = $data['table_id'] ?? null;
 
-			$this->studentModel->beginTransaction();
+			$this->user->beginTransaction();
 
-			$this->studentModel->delete(['id' => $userId], 'users');
+			$this->user->delete(['id' => $userId], 'users');
 
-			$this->studentModel->commit();
+			$this->user->commit();
 			echo http_response_code(200);
 
 		} catch (Exception $e) {
-			$this->studentModel->rollback();
+			$this->user->rollback();
 			throw $e;
 		}
 	}

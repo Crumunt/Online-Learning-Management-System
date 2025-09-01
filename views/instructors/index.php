@@ -247,8 +247,8 @@ $user_role = $_SESSION['user_role'] ?? null;
                 data: "email"
             },
             {
-                data: "courses_count",
-                render: (data) => `<span class="badge badge-primary px-3 py-2">${data}</span><br><small class="text-muted">courses taught</small>`,
+                data: "course_count",
+                render: (data) => `<span class="badge badge-primary px-3 py-2">${data ?? 0}</span><br><small class="text-muted">courses taught</small>`,
             },
         ];
 

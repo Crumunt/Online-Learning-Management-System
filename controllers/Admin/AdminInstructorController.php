@@ -3,18 +3,18 @@ declare(strict_types=1);
 
 class AdminInstructorController extends Controller
 {
-    protected Instructor $instructorModel;
+    protected User $user;
 
     public function __construct()
     {
         parent::__construct();
-        $this->instructorModel = new Instructor();
+        $this->user = new User();
     }
 
     public function index()
     {
-        $table = 'instructor_view';
-        $data = $this->instructorModel->all($table, '*');
+        $table = 'user_view';
+        $data = $this->user->findByRole('instructor', );
 
         if ($this->isAjaxRequest()) {
             $datas = [];
@@ -45,18 +45,18 @@ class AdminInstructorController extends Controller
                 'credentials' => 'users',
                 'details' => 'user_details'
             ];
-            $this->instructorModel->beginTransaction();
+            $this->user->beginTransaction();
 
-            $userId = $this->instructorModel->create($credentials, $tables['credentials']);
+            $userId = $this->user->create($credentials, $tables['credentials']);
 
             if (!$userId) {
                 throw new Exception("Failed to create user credentials");
             }
 
             $user_details['user_id'] = $userId;
-            $this->instructorModel->create($user_details, $tables['details']);
+            $this->user->create($user_details, $tables['details']);
 
-            $this->instructorModel->commit();
+            $this->user->commit();
         } catch (InvalidArgumentException $e) {
             http_response_code(422);  // * UNRPOCESSABLE ENTITY
             echo json_encode([
@@ -78,14 +78,14 @@ class AdminInstructorController extends Controller
 
     public function show($instructor_id)
     {
-        $data = $this->instructorModel->find((int) $instructor_id)->fetch_assoc();
+        $data = $this->user->find((int) $instructor_id)->fetch_assoc();
 
         $this->view('admin/instructors/show', compact('data'));
     }
 
     public function edit($instructor_id)
     {
-        $data = $this->instructorModel->find((int) $instructor_id)->fetch_assoc();
+        $data = $this->user->find((int) $instructor_id)->fetch_assoc();
         $this->view('admin/instructors/update', compact('data'));
     }
 
@@ -96,15 +96,15 @@ class AdminInstructorController extends Controller
             $data = json_decode(file_get_contents("php://input"), true);
             $userId = $data['table_id'] ?? null;
 
-            $this->instructorModel->beginTransaction();
+            $this->user->beginTransaction();
 
-            $this->instructorModel->delete(['id' => $userId], 'users');
+            $this->user->delete(['id' => $userId], 'users');
 
-            $this->instructorModel->commit();
+            $this->user->commit();
             echo http_response_code(200);
 
         } catch (Exception $e) {
-            $this->instructorModel->rollback();
+            $this->user->rollback();
             throw $e;
         }
     }
@@ -191,7 +191,7 @@ class AdminInstructorController extends Controller
 
         switch ($field) {
             case 'email':
-                $has_record = $this->instructorModel->all('users', '*', ['email' => $value]);
+                $has_record = $this->user->all('users', '*', ['email' => $value]);
                 if ($has_record->num_rows > 0) {
                     throw new InvalidArgumentException('Email is already used.');
                 }

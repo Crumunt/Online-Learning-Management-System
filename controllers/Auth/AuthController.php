@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 class AuthController extends Controller
 {
-
-    protected Auth $authModel;
-    protected Student $student;
+    protected User $user;
     protected $guestOnly = true;
 
     protected $requiresAuth = false;
@@ -14,8 +12,7 @@ class AuthController extends Controller
     public function __construct()
     {
         parent::__construct();
-        $this->authModel = new Auth();
-        $this->student = new Student();
+        $this->user = new User();
     }
 
     public function login()
@@ -38,8 +35,7 @@ class AuthController extends Controller
             }
 
             try {
-                $userResult = $this->authModel->all(null,'*',['email' => $email]);
-                $userData = $userResult ? $userResult->fetch_assoc() : null;
+                $userData = $this->user->findByEmail($email);
 
                 if (!$userData || !password_verify($password, $userData['password'])) {
                     $this->setError(401, 'Invalid Email or Password');
@@ -47,9 +43,16 @@ class AuthController extends Controller
                     exit;
                 }
 
+                $userId = (int) $userData['id'];
+
+                if (!$userId) {
+                    $this->setError(404, 'User not found.');
+                    $this->redirect('/login');
+                    exit;
+                }
+
                 // Get student data
-                $studentResult = $this->student->find((int) $userData['id']);
-                $studentData = $studentResult ? $studentResult->fetch_assoc() : null;
+                $studentData = $this->user->fetchData($userId);
 
                 if (!$studentData) {
                     $this->setError(500, 'Something went wrong');
@@ -152,19 +155,19 @@ class AuthController extends Controller
     {
 
         try {
-            $this->authModel->beginTransaction();
+            $this->user->beginTransaction();
 
-            $userId = $this->authModel->create($userCredentials, 'users');
+            $userId = $this->user->create($userCredentials, 'users');
 
             $userDetails['user_id'] = $userId;
-            $this->authModel->create($userDetails, 'user_details');
+            $this->user->create($userDetails, 'user_details');
 
-            $this->authModel->commit();
+            $this->user->commit();
 
             return $userId;
 
         } catch (Exception $e) {
-            $this->authModel->rollback();
+            $this->user->rollback();
             throw $e;
         }
     }

@@ -6,13 +6,13 @@ class CourseController extends Controller
 {
 
 
-    protected Course $courseModel;
+    protected Course $course;
 
     public function __construct()
     {
         parent::__construct();
 
-        $this->courseModel = new Course();
+        $this->course = new Course();
     }
 
     public function serve()

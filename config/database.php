@@ -52,7 +52,7 @@ class Database
         return $this->conn->rollback();
     }
 
-    public function select($table, $row = "*", $where = NULL, $not = NULL, $limit = NULL)
+    public function select($table, $row = "*", $where = NULL, $not = NULL, $orderBy = null, $limit = NULL)
     {
         try {
             if (!is_null($where) || !is_null($not)) {
@@ -79,6 +79,10 @@ class Database
                 $cond = substr($cond, 0, -5); // Remove last " AND "
 
                 $query = "SELECT $row FROM $table WHERE $cond";
+                if (!is_null($orderBy)) {
+                    $query .= " ORDER BY $orderBy";
+                }
+
                 if (!is_null($limit) && is_numeric($limit)) {
                     $query .= " LIMIT " . intval($limit);
                 }
@@ -233,30 +237,32 @@ class Database
 
         $views = [
             'user_view' => "
-            CREATE OR REPLACE VIEW user_view AS 
-            SELECT u.id AS id, u.email AS email, ud.name AS name, 
-                   ud.address AS address, ud.role AS role, ud.status AS status, 
-                   u.created_at AS created_at 
-            FROM (users u JOIN user_details ud ON(u.id = ud.user_id)) 
-            ORDER BY u.id ASC
-        ",
-            'student_view' => "
-            CREATE OR REPLACE VIEW student_view AS 
-            SELECT s.id AS id, s.email AS email, ud.name AS name, 
-                   ud.status AS status, ud.role AS role, 
-                   COUNT(e.student_id) AS courses_enrolled, s.created_at AS created_at 
-            FROM ((users s JOIN user_details ud ON(s.id = ud.user_id AND ud.role = 'student')) 
-                  LEFT JOIN enrollments e ON(s.id = e.student_id)) 
-            GROUP BY s.id, s.email, ud.name
-        ",
-            'instructor_view' => "
-            CREATE OR REPLACE VIEW instructor_view AS 
-            SELECT i.id AS id, i.email AS email, ud.name AS name, 
-                   ud.status AS status, COUNT(c.id) AS courses_count, 
-                   i.created_at AS created_at 
-            FROM ((users i JOIN user_details ud ON(i.id = ud.user_id AND ud.role = 'instructor')) 
-                  LEFT JOIN courses c ON(c.instructor_id = i.id)) 
-            GROUP BY i.id, i.email, ud.name
+            CREATE OR REPLACE VIEW user_view AS
+            SELECT
+                u.id,
+                u.email,
+                d.name,
+                d.role,
+                d.address,
+                d.status,
+                d.created_at,
+                CASE
+                    WHEN d.role = 'student' THEN sc.courses_enrolled
+                    WHEN d.role = 'instructor' THEN ic.courses_taught
+                    ELSE NULL
+                END AS course_count
+            FROM users u
+            LEFT JOIN user_details d ON u.id = d.user_id
+            LEFT JOIN (
+                SELECT student_id, COUNT(*) AS courses_enrolled
+                FROM courses_enrolled
+                GROUP BY student_id
+            ) sc ON sc.student_id = u.id
+            LEFT JOIN (
+                SELECT instructor_id, COUNT(*) AS courses_taught
+                FROM courses
+                GROUP BY instructor_id
+            ) ic ON ic.instructor_id = u.id;
         ",
             'course_view' => "
             CREATE OR REPLACE VIEW course_view AS 

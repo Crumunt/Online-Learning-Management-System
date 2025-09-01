@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 class AdminDashboardController extends Controller
 {
-    protected Admin $adminModel;
+    protected User $user;
 
     protected $requiresAuth = true;
 
@@ -12,7 +12,7 @@ class AdminDashboardController extends Controller
     public function __construct()
     {
         parent::__construct();
-        $this->adminModel = new Admin();
+        $this->user = new User();
     }
 
     public function index()
@@ -21,8 +21,8 @@ class AdminDashboardController extends Controller
         $card_data = array_fill_keys(['admin_count', 'student_count', 'instructor_count', 'total_courses', 'total_materials'], 0);
         $valid_roles = ['admin', 'instructor', 'student'];
         try {
-            $result = $this->adminModel->all();
-            $course_result = $this->adminModel->all('course_view', 'COUNT(id) as total_courses, SUM(course_content) AS total_materials', ['status' => 'approved'])->fetch_assoc();
+            $result = $this->user->all('user_view');
+            $course_result = $this->user->all('course_view', 'COUNT(id) as total_courses, SUM(course_content) AS total_materials', ['status' => 'approved'])->fetch_assoc();
             if (!$result || !$course_result) {
                 throw new Exception('Failed to fetch user data');
             }
@@ -50,7 +50,7 @@ class AdminDashboardController extends Controller
 
     private function getWeeklyEnrollmentData()
     {
-        $enroll_result = $this->adminModel->all('student_enrollments_by_day');
+        $enroll_result = $this->user->all('student_enrollments_by_day');
 
         $enrollments = array_fill_keys(['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'], 0);
         while ($row = $enroll_result->fetch_assoc()) {
@@ -65,7 +65,7 @@ class AdminDashboardController extends Controller
 
     public function show($id)
     {
-        $admin = $this->adminModel->find((int) $id);
+        $admin = $this->user->find((int) $id);
         if (!$admin) {
             header("HTTP/1.0 404 Not Found");
             // echo "Admin Not Found";
