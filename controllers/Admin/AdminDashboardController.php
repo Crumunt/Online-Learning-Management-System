@@ -67,7 +67,7 @@ class AdminDashboardController extends Controller
 
     private function getTopPerformingCourses()
     {
-        $data = $this->course->all('course_view', 'title, difficulty, instructor_name, status, enrollments', null, null, 'enrollments DESC', 5)->fetch_all(MYSQLI_ASSOC);
+        $data = $this->course->all('course_view', 'title, difficulty, instructor_name, status, enrollments', ['status' => 'approved'], null, 'enrollments DESC', 5)->fetch_all(MYSQLI_ASSOC);
         return [
             'headers' => [
                 'Instructor',
@@ -94,16 +94,5 @@ class AdminDashboardController extends Controller
             'labels' => array_keys($enrollments),
             'data' => array_values($enrollments)
         ];
-    }
-
-    public function show($id)
-    {
-        $admin = $this->user->find((int) $id);
-        if (!$admin) {
-            header("HTTP/1.0 404 Not Found");
-            // echo "Admin Not Found";
-            return;
-        }
-        $this->view('admin/show', compact('admin'));
     }
 }

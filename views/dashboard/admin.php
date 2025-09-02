@@ -67,10 +67,10 @@
             <div class="ibox-content">
                 <div class="row text-center">
                     <?= component('dashboard/distribution-metrics', ['color' => 'primary', 'contentMetric' => 0, 'metricName' => 'Video Lessons']) ?>
-                    <?= component('dashboard/distribution-metrics', ['color' => 'primary', 'contentMetric' => $cardData['totalMaterials'], 'metricName' => 'Text Lessons', 'isEdge' => true]) ?>
+                    <?= component('dashboard/distribution-metrics', ['color' => 'primary', 'contentMetric' => $cardData['totalMaterials'] ?? 0, 'metricName' => 'Text Lessons', 'isEdge' => true]) ?>
                 </div>
                 <div class="row text-center m-t-lg">
-                    <?= component('dashboard/distribution-metrics', ['color' => 'success', 'contentMetric' => $cardData['totalMaterials'], 'metricName' => 'Total Modules']) ?>
+                    <?= component('dashboard/distribution-metrics', ['color' => 'success', 'contentMetric' => $cardData['totalMaterials'] ?? 0, 'metricName' => 'Total Modules']) ?>
                     <?= component('dashboard/distribution-metrics', ['color' => 'warning', 'contentMetric' => 0, 'metricName' => 'Total Quizzes', 'isEdge' => true]) ?>
                 </div>
             </div>

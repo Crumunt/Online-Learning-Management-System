@@ -223,9 +223,9 @@ class InstructorController extends Controller
         $contentResult = $this->course->all('course_content', '*', ['course_id' => $courseId]);
         $contentData = $contentResult ? $contentResult->fetch_all(MYSQLI_ASSOC) : [];
 
-        $courseData = $this->user->processCourseData($hasRecord);
+        $courseData = $this->course->processCourseData($hasRecord);
 
-        $contentView = $this->user->processContentView($contentData);
+        $contentView = $this->course->processContentView($contentData);
 
 
         $this->view('courses/content/show', compact('courseData', 'userRole', 'contentView'));

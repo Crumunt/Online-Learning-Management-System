@@ -14,8 +14,7 @@ class AdminStudentController extends Controller
 
 	public function index()
 	{
-		$table = 'student_view';
-		$data = $this->user->all($table, '*');
+		$data = $this->user->findByRole('student');
 
 		if ($this->isAjaxRequest()) {
 			$datas = [];
@@ -79,14 +78,14 @@ class AdminStudentController extends Controller
 
 	public function show($student_id)
 	{
-		$data = $this->user->find((int) $student_id)->fetch_assoc();
+		$data = $this->user->fetchData((int) $student_id);
 
-		$this->view('admin/students/show', compact('data'));
+		$this->view('users/show', compact('data'));
 	}
 
 	public function edit($student_id)
 	{
-		$data = $this->user->find((int) $student_id)->fetch_assoc();
+		$data = $this->user->fetchData((int) $student_id);
 		$this->view('admin/students/update', compact('data'));
 	}
 

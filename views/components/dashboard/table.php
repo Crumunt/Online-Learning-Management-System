@@ -16,14 +16,24 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($tableData['tableData'] as $row): ?>
+                    <?php if (empty($tableData['tableData'])): ?>
                         <tr>
-                            <?php foreach ($tableData['columns'] as $col): ?>
-                                <td><?= ($col === 'enrolled_at') ? date('M d, Y', strtotime($row[$col])) : ucwords($row[$col]) ?>
-                                </td>
-                            <?php endforeach; ?>
+                            <td colspan="100%" class="text-center text-muted py-5">
+                                <i class="fa fa-info-circle fa-2x mb-3 text-warning d-block"></i>
+                                <strong>No data found</strong><br>
+                                <small>There are currently no <?= strtolower($tableHeader) ?>.</small>
+                            </td> 
                         </tr>
-                    <?php endforeach; ?>
+                    <?php else: ?>
+                        <?php foreach ($tableData['tableData'] as $row): ?>
+                            <tr>
+                                <?php foreach ($tableData['columns'] as $col): ?>
+                                    <td><?= ($col === 'enrolled_at') ? date('M d, Y', strtotime($row[$col])) : ucwords($row[$col]) ?>
+                                    </td>
+                                <?php endforeach; ?>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                 </tbody>
             </table>
         </div>

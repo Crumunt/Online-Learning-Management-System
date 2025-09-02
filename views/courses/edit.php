@@ -64,8 +64,8 @@ $course_diff = $data['difficulty'];
                                 <div class="form-group">
                                     <label for="course-description">Description <span
                                             class="text-danger">*</span></label>
-                                    <textarea class="form-control" id="course-description" name="short_description" rows="6"
-                                        required
+                                    <textarea class="form-control" id="course-description" name="short_description"
+                                        rows="6" required
                                         placeholder="Describe what students will learn in this course"><?= $data['description'] ?></textarea>
                                     <small class="form-text text-muted">Provide a detailed description of the course
                                         content and learning objectives</small>
@@ -89,9 +89,10 @@ $course_diff = $data['difficulty'];
                                                 Approved</option>
                                             <option value="rejected" <?= ($course_status === 'rejected') ? 'selected' : '' ?>>
                                                 Rejected</option>
+                                        <?php else: ?>
+                                            <option value="draft">Draft</option>
+                                            <option value="archived">Archived</option>
                                         <?php endif; ?>
-                                        <option value="draft">Draft</option>
-                                        <option value="archived">Archived</option>
                                     </select>
                                     <small class="form-text text-muted">Control the visibility and accessibility of your
                                         course</small>

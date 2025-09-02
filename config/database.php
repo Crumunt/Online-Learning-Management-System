@@ -236,6 +236,17 @@ class Database
         )");
 
         $views = [
+            'courses_enrolled' => "
+            CREATE OR REPLACE VIEW courses_enrolled AS 
+            SELECT i.user_id AS instructor_id, i.name AS instructor_name, 
+                   c.id AS course_id, c.course_name AS title, c.status AS course_status, 
+                   c.short_description AS description, s.user_id AS student_id, 
+                   s.name AS student_name, e.enrolled_at AS enrolled_at 
+            FROM (((enrollments e JOIN user_details s ON(e.student_id = s.user_id)) 
+                   JOIN courses c ON(e.course_id = c.id AND c.status = 'approved')) 
+                   JOIN user_details i ON(c.instructor_id = i.user_id)) 
+            ORDER BY i.user_id DESC
+        ",
             'user_view' => "
             CREATE OR REPLACE VIEW user_view AS
             SELECT
@@ -277,17 +288,6 @@ class Database
             GROUP BY c.id, c.course_name, c.short_description, c.status, u.name, 
                      c.instructor_id, c.created_at 
             ORDER BY COUNT(DISTINCT e.student_id) DESC
-        ",
-            'courses_enrolled' => "
-            CREATE OR REPLACE VIEW courses_enrolled AS 
-            SELECT i.user_id AS instructor_id, i.name AS instructor_name, 
-                   c.id AS course_id, c.course_name AS title, c.status AS course_status, 
-                   c.short_description AS description, s.user_id AS student_id, 
-                   s.name AS student_name, e.enrolled_at AS enrolled_at 
-            FROM (((enrollments e JOIN user_details s ON(e.student_id = s.user_id)) 
-                   JOIN courses c ON(e.course_id = c.id AND c.status = 'approved')) 
-                   JOIN user_details i ON(c.instructor_id = i.user_id)) 
-            ORDER BY i.user_id DESC
         ",
             'student_enrollments_by_day' => "
             CREATE OR REPLACE VIEW student_enrollments_by_day AS 

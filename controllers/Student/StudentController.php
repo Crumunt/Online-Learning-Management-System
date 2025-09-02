@@ -64,8 +64,8 @@ class StudentController extends Controller
         $contentResult = $this->course->all('course_content', '*', ['course_id' => $courseId]);
         $contentData = $contentResult ? $contentResult->fetch_all(MYSQLI_ASSOC) : [];
 
-        $courseData = $this->user->processCourseData($hasRecord);
-        $contentView = $this->user->processContentView($contentData);
+        $courseData = $this->course->processCourseData($hasRecord);
+        $contentView = $this->course->processContentView($contentData);
 
 
         $this->view('courses/content/show', compact('courseData', 'contentView', 'userRole'));

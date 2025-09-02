@@ -31,6 +31,12 @@ class CourseManagementController extends Controller
 
     public function show($courseId)
     {
+        $userId = $_SESSION['user_id'] ?? null;
+        $userRole = $_SESSION['user_role'] ?? null;
+
+        if(!$userId || !$userRole) {
+            throw new InvalidArgumentException('Invaid access.');
+        }
 
         // CHECK IF HAS COURSE
         $hasRecord = $this->course->all('course_view', '*', ['id' => $courseId])->fetch_assoc();
@@ -40,19 +46,14 @@ class CourseManagementController extends Controller
         }
 
         $contentResult = $this->course->all('course_content', '*', ['course_id' => $courseId]);
-        $content_data = $contentResult ? $contentResult->fetch_all(MYSQLI_ASSOC) : [];
+        $contentData = $contentResult ? $contentResult->fetch_all(MYSQLI_ASSOC) : [];
 
-        $course_data = [
-            'course_instructor' => $hasRecord['instructor_name'],
-            'course_title' => $hasRecord['title'],
-            'course_description' => $hasRecord['description'],
-            'course_created_at' => date('M d, Y', strtotime($hasRecord['created_at'])),
-            'student_count' => $hasRecord['enrollments'] ?? 0,
-            'material_count' => $hasRecord['course_content'] ?? 0,
-            'course_status' => $hasRecord['status'],
-        ];
+        $courseData = $this->course->processCourseData($hasRecord);
 
-        $this->view('courses/content/show', compact('content_data', 'course_data'));
+        $contentView = $this->course->processContentView($contentData);
+
+
+        $this->view('courses/content/show', compact('contentView', 'courseData', 'userRole'));
 
     }
 
@@ -66,7 +67,7 @@ class CourseManagementController extends Controller
                 throw new Exception('Unauthorized');
             }
 
-            $data = $this->course->find((int) $courseId)->fetch_assoc();
+            $data = $this->course->find((int) $courseId);
             $this->view('courses/edit', compact('data'));
         } catch (Exception $e) {
             throw new Exception('Invalid action.');

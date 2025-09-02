@@ -86,7 +86,7 @@ $router->post('/admin/instructor/delete', ['AdminInstructorController', 'destroy
 
 // ADMIN - COURSE
 $router->get('/admin/courses', ['CourseManagementController', 'index']);
-$router->get('/admin/course/show/(\d+)', ['CourseManagementController', 'show']);
+$router->get('/admin/courses/show/(\d+)', ['CourseManagementController', 'show']);
 $router->get('/admin/courses/update/(\d+)', ['CourseManagementController', 'edit']);
 $router->post('/admin/course/update', ['CourseManagementController', 'update']);
 $router->post('/admin/course/delete', ['CourseManagementController', 'destroy']);

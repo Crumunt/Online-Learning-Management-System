@@ -1,124 +1,92 @@
 <div class="container my-5">
 
-    <div class="row justify-content-center">
-        <div class="col-lg-8 col-md-10">
-            <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
+    <form id="createInstructorForm" action="/admin/instructor/create" method="POST" novalidate>
 
-                <!-- Header -->
-                <div class="p-4 text-white" style="background: linear-gradient(135deg, #4e73df, #224abe);">
-                    <h2 class="mb-0">
-                        <i class="fa fa-graduation-cap me-2"></i> Create New Instructor
-                    </h2>
+        <!-- Full Name -->
+        <div class="form-group">
+            <label for="name" class="font-weight-bold">Full Name <span class="text-danger">*</span></label>
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text bg-white text-primary"><i class="fa fa-user"></i></span>
                 </div>
+                <input type="text" class="form-control" id="name" name="name" placeholder="John Doe" required>
+            </div>
+            <div class="invalid-feedback">Please enter the full name.</div>
+        </div>
 
-                <!-- Body -->
-                <div class="card-body p-4 bg-light">
-
-                    <!-- Success/Error Alerts -->
-                    <div id="alertContainer" class="mb-3"></div>
-
-                    <form id="createInstructorForm" novalidate action="/admin/instructor/create" method="POST">
-
-                        <!-- Name -->
-                        <div class="mb-4">
-                            <label for="name" class="form-label fw-semibold">Full Name <span
-                                    class="text-danger">*</span></label>
-                            <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text bg-white text-primary">
-                                        <i class="fa fa-user"></i>
-                                    </span>
-                                </div>
-                                <input type="text" class="form-control form-control-lg rounded-right-pill" id="name"
-                                    name="name" placeholder="Enter instructor's full name" required>
-                            </div>
-                            <div class="invalid-feedback"></div>
-                        </div>
-
-                        <!-- Email -->
-                        <div class="mb-4">
-                            <label for="email" class="form-label fw-semibold">Email Address <span
-                                    class="text-danger">*</span></label>
-                            <div class="input-group position-relative">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text bg-white text-primary">
-                                        <i class="fa fa-envelope"></i>
-                                    </span>
-                                </div>
-                                <input type="email" class="form-control form-control-lg rounded-right-pill" id="email"
-                                    name="email" placeholder="Enter instructor's email address" required>
-                                <div class="position-absolute top-50 end-0 translate-middle-y pe-3 d-none"
-                                    id="emailSpinner">
-                                    <div class="spinner-border spinner-border-sm text-primary"></div>
-                                </div>
-                            </div>
-                            <div class="invalid-feedback"></div>
-                            <small class="text-muted"><i class="fa fa-info-circle me-1"></i> Used for login
-                                credentials</small>
-                        </div>
-
-                        <!-- Password -->
-                        <div class="mb-4">
-                            <label for="password" class="form-label fw-semibold">Password <span
-                                    class="text-danger">*</span></label>
-                            <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text bg-white text-primary">
-                                        <i class="fa fa-lock"></i>
-                                    </span>
-                                </div>
-                                <input type="password" class="form-control form-control-lg" id="password"
-                                    name="password" placeholder="Enter a secure password" required>
-                            </div>
-                            <div class="invalid-feedback"></div>
-                            <small class="text-muted"><i class="fa fa-info-circle me-1"></i>
-                                At least 8 characters, including uppercase, lowercase, number, and symbol</small>
-                        </div>
-
-                        <!-- Confirm Password -->
-                        <div class="mb-4">
-                            <label for="confirm_password" class="form-label fw-semibold">Confirm Password <span
-                                    class="text-danger">*</span></label>
-                            <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text bg-white text-primary">
-                                        <i class="fa fa-lock"></i>
-                                    </span>
-                                </div>
-                                <input type="password" class="form-control form-control-lg rounded-right-pill"
-                                    id="confirm_password" name="confirm_password" placeholder="Confirm the password"
-                                    required>
-                            </div>
-                            <div class="invalid-feedback"></div>
-                        </div>
-
-                        <!-- Hidden Inputs -->
-                        <input type="hidden" name="role" value="instructor">
-                        <input type="hidden" name="status" value="pending">
-
-                        <!-- Actions -->
-                        <div class="pt-3 border-top d-flex justify-content-between">
-                            <button type="button" class="btn btn-outline-secondary btn-lg px-4 rounded-pill shadow-sm"
-                                onclick="window.history.back()">
-                                <i class="fa fa-arrow-left me-2"></i> Cancel
-                            </button>
-                            <div>
-                                <button type="button" class="btn btn-secondary btn-lg px-4 rounded-pill shadow-sm me-2"
-                                    onclick="resetForm()">
-                                    <i class="fa fa-undo me-2"></i> Reset
-                                </button>
-                                <button type="submit" class="btn btn-primary btn-lg px-4 rounded-pill shadow-sm"
-                                    id="submitBtn">
-                                    <i class="fa fa-chalkboard-teacher me-2"></i> Create Instructor
-                                </button>
-                            </div>
-                        </div>
-
-                    </form>
+        <!-- Email -->
+        <div class="form-group">
+            <label for="email" class="font-weight-bold">Email Address <span class="text-danger">*</span></label>
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text bg-white text-primary"><i class="fa fa-envelope"></i></span>
+                </div>
+                <input type="email" class="form-control" id="email" name="email" placeholder="name@example.com"
+                    required>
+                <div class="input-group-append d-none" id="emailSpinner">
+                    <span class="input-group-text bg-white">
+                        <div class="spinner-border spinner-border-sm text-primary"></div>
+                    </span>
                 </div>
             </div>
+            <small class="form-text text-muted">
+                <i class="fa fa-info-circle mr-1"></i>Used for login credentials.
+            </small>
+            <div class="invalid-feedback">Please enter a valid email address.</div>
         </div>
-    </div>
+
+        <!-- Password -->
+        <div class="form-group">
+            <label for="password" class="font-weight-bold">Password <span class="text-danger">*</span></label>
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text bg-white text-primary"><i class="fa fa-lock"></i></span>
+                </div>
+                <input type="password" class="form-control" id="password" name="password" placeholder="••••••••"
+                    required>
+            </div>
+            <small class="form-text text-muted">
+                <i class="fa fa-info-circle mr-1"></i>At least 8 characters including uppercase, lowercase, number, and
+                symbol.
+            </small>
+            <div class="invalid-feedback">Please enter a valid password.</div>
+        </div>
+
+        <!-- Confirm Password -->
+        <div class="form-group">
+            <label for="confirm_password" class="font-weight-bold">Confirm Password <span
+                    class="text-danger">*</span></label>
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text bg-white text-primary"><i class="fa fa-lock"></i></span>
+                </div>
+                <input type="password" class="form-control" id="confirm_password" name="confirm_password"
+                    placeholder="Re-enter password" required>
+            </div>
+            <div class="invalid-feedback">Passwords do not match.</div>
+        </div>
+
+        <!-- Hidden Inputs -->
+        <input type="hidden" name="role" value="instructor">
+        <input type="hidden" name="status" value="pending">
+
+        <!-- Form Actions -->
+        <div class="d-flex justify-content-between align-items-center border-top pt-3 mt-4">
+            <button type="button" class="btn btn-outline-secondary" onclick="window.history.back()">
+                <i class="fa fa-arrow-left mr-2"></i>Cancel
+            </button>
+            <div>
+                <button type="button" class="btn btn-secondary mr-2" onclick="resetForm()">
+                    <i class="fa fa-undo mr-2"></i>Reset
+                </button>
+                <button type="submit" class="btn btn-primary" id="submitBtn">
+                    <i class="fa fa-chalkboard-teacher mr-2"></i>Create Instructor
+                </button>
+            </div>
+        </div>
+
+    </form>
+
 </div>
 
 

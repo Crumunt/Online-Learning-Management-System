@@ -42,7 +42,7 @@ class Model
     }
 
     // FETCH USER DATA
-    public function findv2(int $id, string $columns = '*')
+    public function find(int $id, string $columns = '*')
     {
         $result = $this->conn->select($this->viewTable, $columns, [$this->primaryKey => $id]);
 
@@ -71,10 +71,10 @@ class Model
         return $this->conn->select($table, $row, $where, $not);
     }
 
-    public function find(int $id)
-    {
-        return $this->conn->select($this->table, '*', ['id' => $id]);
-    }
+    // public function find(int $id)
+    // {
+    //     return $this->conn->select($this->table, '*', ['id' => $id]);
+    // }
 
     public function create(array $data, $table = null)
     {
