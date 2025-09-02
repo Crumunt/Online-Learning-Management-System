@@ -4,7 +4,7 @@ declare(strict_types=1);
 class AdminDashboardController extends Controller
 {
     protected User $user;
-
+    protected Course $course;
     protected $requiresAuth = true;
 
     protected $allowedRoles = ['admin'];
@@ -13,12 +13,13 @@ class AdminDashboardController extends Controller
     {
         parent::__construct();
         $this->user = new User();
+        $this->course = new Course();
     }
 
     public function index()
     {
         $data = [];
-        $card_data = array_fill_keys(['admin_count', 'student_count', 'instructor_count', 'total_courses', 'total_materials'], 0);
+        $cardData = array_fill_keys(['admin_count', 'student_count', 'instructor_count', 'total_courses', 'total_materials'], 0);
         $valid_roles = ['admin', 'instructor', 'student'];
         try {
             $result = $this->user->all('user_view');
@@ -28,24 +29,56 @@ class AdminDashboardController extends Controller
             }
 
 
-            $card_data['total_courses'] = $course_result['total_courses'];
-            $card_data['total_materials'] = $course_result['total_materials'];
+            $cardData['totalCourses'] = $course_result['total_courses'];
+            $cardData['totalMaterials'] = $course_result['total_materials'];
 
             // ITERATE OVER RESULTS AND STORE AS INDEXED ARRAY
             while ($row = $result->fetch_assoc()) {
                 $data[] = $row;
 
                 if (in_array($row['role'], $valid_roles)) {
-                    $card_data[$row['role'] . '_count']++;
+                    $cardData[$row['role'] . '_count']++;
                 }
             }
 
             $enrollment_data = json_encode($this->getWeeklyEnrollmentData());
-
-            $this->view('dashboard/admin', compact('data', 'card_data', 'enrollment_data'));
+            $latestEnrollments = $this->getLatestEnrollments();
+            $topPerformingCourses = $this->getTopPerformingCourses();
+            $this->view('dashboard/admin', compact('data', 'cardData', 'enrollment_data', 'latestEnrollments', 'topPerformingCourses'));
         } catch (Exception $e) {
-            $this->view('dashboard/admin', compact('data', 'card_data'));
+            $this->view('dashboard/admin', compact('data', 'cardData'));
         }
+    }
+
+    private function getLatestEnrollments()
+    {
+        $data = $this->user->all('courses_enrolled', 'student_name, title, instructor_name, enrolled_at', null, null, 'enrolled_at DESC', 5)->fetch_all(MYSQLI_ASSOC);
+        return [
+            'headers' => [
+                'Student',
+                'Course',
+                'Instructor',
+                'Enrolled'
+            ],
+            'columns' => ['student_name', 'title', 'instructor_name', 'enrolled_at'],
+            'tableData' => $data
+        ];
+    }
+
+    private function getTopPerformingCourses()
+    {
+        $data = $this->course->all('course_view', 'title, difficulty, instructor_name, status, enrollments', null, null, 'enrollments DESC', 5)->fetch_all(MYSQLI_ASSOC);
+        return [
+            'headers' => [
+                'Instructor',
+                'Course',
+                'Difficulty',
+                'Enrollments',
+                'Status'
+            ],
+            'columns' => ['instructor_name', 'title', 'difficulty', 'enrollments', 'status'],
+            'tableData' => $data
+        ];
     }
 
     private function getWeeklyEnrollmentData()

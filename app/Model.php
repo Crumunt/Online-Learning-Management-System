@@ -64,7 +64,7 @@ class Model
         return null;
     }
 
-    public function all($table = null, $row = "*", $where = NULL, $not = NULL)
+    public function all($table = null, $row = "*", $where = NULL, $not = NULL, $orderBy = null, $limit = null)
     {
         $table ??= $this->table;
 
