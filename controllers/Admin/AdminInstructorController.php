@@ -31,7 +31,9 @@ class AdminInstructorController extends Controller
 
     public function create()
     {
-        $this->view('admin/instructors/create');
+        $userType = 'instructor';
+        $urlEndpoint = '/admin/instructor/create';
+        $this->view('users/create', compact('userType', 'urlEndpoint'));
     }
 
     public function store()

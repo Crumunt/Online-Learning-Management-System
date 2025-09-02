@@ -11,6 +11,10 @@ function generateToast(text, icon = "warning", heading = "") {
 }
 
 function resetForm() {
+  const passwordStrength = $("#passwordStrength");
+  if(passwordStrength) {
+    passwordStrength.css("width", '')
+  }
   $("form")[0].reset();
 }
 
