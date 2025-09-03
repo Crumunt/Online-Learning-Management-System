@@ -42,9 +42,13 @@
                             </div>
 
                             <div class="course-meta">
-                                <div class="meta-item">
-                                    <span class="meta-label">Instructor:</span>
-                                    <span class="meta-value"><?= $row['instructor_name'] ?></span>
+                                <div class="course-meta">
+                                    <div class="meta-item">
+                                        <div class="meta-group">
+                                            <span class="meta-label">Instructor:</span>
+                                            <span class="meta-value"><?= ucwords($row['instructor_name']) ?></span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 

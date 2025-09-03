@@ -22,6 +22,7 @@ class Course extends Model
                     'id' => $course['id'],
                     'title' => $course['title'],
                     'description' => $course['description'],
+                    'difficulty' => $course['difficulty'],
                     'instructor_name' => $course['instructor_name']
                 ];
             }

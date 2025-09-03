@@ -199,7 +199,7 @@ class InstructorController extends Controller
     public function showEdit($courseId)
     {
         $instructor_id = $_SESSION['user_id'] ?? null;
-        $data = $this->course->find((int) $courseId)->fetch_assoc();
+        $data = $this->course->find((int) $courseId);
 
         $this->view('courses/edit', compact('data'));
     }

@@ -221,22 +221,22 @@
         }
     })
 
-    $('#email').blur(function () {
-        const emailSpinner = $('#emailSpinner');
-        const email = $(this).val();
+    // $('#email').blur(function () {
+    //     const emailSpinner = $('#emailSpinner');
+    //     const email = $(this).val();
 
-        if (email && email.includes('@')) {
-            emailSpinner.removeClass('d-none');
+    //     if (email && email.includes('@')) {
+    //         emailSpinner.removeClass('d-none');
 
-            // Simulate email check
-            // ! TODO EMAIL CHECK
-            setTimeout(() => {
-                emailSpinner.addClass('d-none');
-                $(this).addClass('is-valid');
-            }, 1000);
-        }
+    //         // Simulate email check
+    //         // ! TODO EMAIL CHECK
+    //         setTimeout(() => {
+    //             emailSpinner.addClass('d-none');
+    //             $(this).addClass('is-valid');
+    //         }, 1000);
+    //     }
 
-    })
+    // })
 
 
     $(document).ready(function () {

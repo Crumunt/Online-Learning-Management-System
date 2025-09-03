@@ -41,25 +41,26 @@
                             <div class="course-header">
                                 <h4 class="course-title"><?= $row['title'] ?></h4>
                                 <p class="course-description text-muted">
-                                    <?= $row['description'] ?>
+                                    <?= ucfirst($row['description']) ?>
                                 </p>
                             </div>
 
                             <div class="course-meta">
-                                <div class="meta-item">
-                                    <span class="meta-label">Instructor:</span>
-                                    <span class="meta-value"><?= $row['instructor_name'] ?></span>
+                                <div class="meta-item d-flex justify-content-between">
+                                    <div class="meta-group">
+                                        <span class="meta-label">Difficulty:</span>
+                                        <span class="meta-value"><?= ucfirst($row['difficulty']) ?></span>
+                                    </div>
+                                    <div class="meta-group">
+                                        <span class="meta-label">Instructor:</span>
+                                        <span class="meta-value"><?= ucwords($row['instructor_name']) ?></span>
+                                    </div>
                                 </div>
                             </div>
 
                             <div class="course-actions">
                                 <div class="d-flex flex-column">
-                                    <a href="/course/show/<?= $row['id'] ?>"
-                                        class="btn btn-outline-primary btn-block mr-2">
-                                        Learn More
-                                    </a>
-                                    <button class="btn btn-success btn-block enrollBtn"
-                                        data-course-id="<?= $row['id'] ?>">
+                                    <button class="btn btn-success btn-block enrollBtn" data-course-id="<?= $row['id'] ?>">
                                         Enroll Now
                                     </button>
                                 </div>

@@ -28,7 +28,7 @@ $course_diff = $data['difficulty'];
                         </ol>
                     </div>
                     <div class="col-md-4 text-right">
-                        <a href="/instructor/course/show/<?= $data['id'] ?>"
+                        <a href="/instructor/courses/show/<?= $data['id'] ?>"
                             class="btn btn-outline-secondary btn-sm mr-2">
                             <i class="fa fa-arrow-left mr-1"></i>Back to Details
                         </a>
