@@ -61,8 +61,8 @@ if (true) {
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group">
-                                    <label for="content-title">Content Title <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="course_name" name="course_name" required
+                                    <label for="course_name">Content Title <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="course_name" name="title" required
                                         placeholder="Enter content title (e.g., Introduction to HTML)">
                                     <small class="form-text text-muted">Choose a clear, descriptive title for this
                                         content</small>
@@ -428,7 +428,8 @@ if (true) {
                 ERROR: 'Upload failed. Please try again.',
             },
             UPDATE: {
-                SUCCESS: 'Course update success!',
+                HEADER: 'Course update success!',
+                SUCCESS: 'Redirecting back to view.',
                 ERROR: 'Update failed. Please try again.',
             }
         },
@@ -452,12 +453,13 @@ if (true) {
                             url: '<?= $_SERVER['REQUEST_URI'] ?>',
                             method: 'GET',
                             success: function (data) {
+                                console.log('this happened')
                                 var res = JSON.parse(data);
 
                                 const decodedData = decodeHtml(res.contentData);
                                 $('#content-entry-form').data('endpoint', 'UPDATE');
                                 $('#hidden_id').val(res.id);
-                                $('#content-title').val(res.contentTitle);
+                                $('#course_name').val(res.contentTitle);
                                 $('#content-status').val(res.status);
                                 showFilePreview([{ filename: res.file_name, filesize: res.file_size }]);
                                 editor.setContent(decodedData);
@@ -498,7 +500,7 @@ if (true) {
             let formData = new FormData(this);
 
             // * SET TINMYCE VAL
-            formData.set('short_description', content);
+            formData.set('content', content);
 
             let fileInput = this.querySelector('input[type="file"]');
             if (fileInput && fileInput.files.length > 0) {
@@ -531,10 +533,10 @@ if (true) {
                     // loader
                 },
                 success: function (res) {
-                    generateToast(CONFIG.MESSAGES[endpointKey].SUCCESS, CONFIG.TOAST.ICON.SUCCESS);
+                    generateToast(CONFIG.MESSAGES[endpointKey].SUCCESS, CONFIG.TOAST.ICON.SUCCESS, CONFIG.MESSAGES[endpointKey].HEADER);
 
                     setTimeout(() => {
-                        window.location.href = '/instructor/course';
+                        window.location.href = '/instructor/courses';
                     }, 3000);
                 },
                 error: function (error) {
@@ -542,10 +544,6 @@ if (true) {
                     console.log(res)
                     var toastText = res.message;
                     generateToast(toastText, CONFIG.TOAST.ICON.ERROR, CONFIG.MESSAGES[endpointKey].ERROR);
-                },
-                complete: function () {
-                    resetForm();
-                    removeFile();
                 }
             });
         });
@@ -557,7 +555,7 @@ if (true) {
         if (confirm('Are you sure you want to cancel? Any unsaved changes will be lost.')) {
             // In a real application, redirect to course details
             alert('Redirecting to course...');
-            window.location.href = '/instructor/course'
+            window.location.href = '/instructor/courses';
         }
     }
 

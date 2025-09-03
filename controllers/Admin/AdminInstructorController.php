@@ -88,7 +88,7 @@ class AdminInstructorController extends Controller
     public function edit($instructorId)
     {
         $data = $this->user->fetchData((int) $instructorId);
-        $this->view('admin/instructors/update', compact('data'));
+        $this->view('instructors/edit', compact('data'));
     }
 
     public function destroy()

@@ -87,10 +87,6 @@ $user_role = $_SESSION['user_role'] ?? null;
                     </h5>
                     <div class="ibox-tools">
                         <div class="dropdown">
-                            <button class="btn btn-sm btn-light dropdown-toggle" type="button" data-toggle="dropdown"
-                                style="border: 1px solid #dee2e6;">
-                                <i class="fa fa-filter"></i> Filter <span class="caret"></span>
-                            </button>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" href="#" data-filter="all">All Instructors</a></li>
                                 <li><a class="dropdown-item" href="#" data-filter="active">Active Only</a></li>

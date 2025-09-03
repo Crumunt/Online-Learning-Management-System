@@ -72,8 +72,6 @@ class CourseManagementController extends Controller
         } catch (Exception $e) {
             throw new Exception('Invalid action.');
         }
-        // $data = $this->course->find((int) $id)->fetch_assoc();
-        // $this->view('admin/courses/update', compact('data'));
     }
 
     public function update()

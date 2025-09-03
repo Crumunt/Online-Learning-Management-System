@@ -224,7 +224,7 @@ $status = [
                                             <span><i class="fa fa-file-pdf mr-2"></i><?= $content['title'] ?></span>
                                             <div class="group">
                                                 <!-- <i class="fa fa-check-circle text-primary"></i> -->
-                                                <?php if (in_array($userRole, ['instructor', 'admin'])): ?>
+                                                <?php if (in_array($userRole, ['instructor'])): ?>
                                                     <div class="btn-group">
                                                         <button class="btn btn-danger deleteBtn mx-1"
                                                             data-content-id="<?= $content['id'] ?>">

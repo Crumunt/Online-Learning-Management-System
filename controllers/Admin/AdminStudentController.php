@@ -31,7 +31,9 @@ class AdminStudentController extends Controller
 
 	public function create()
 	{
-		$this->view('admin/students/create');
+		$userType = 'student';
+		$urlEndpoint = '/admin/student/create';
+		$this->view('users/create', compact('userType', 'urlEndpoint'));
 	}
 
 	public function store()
@@ -86,7 +88,7 @@ class AdminStudentController extends Controller
 	public function edit($student_id)
 	{
 		$data = $this->user->fetchData((int) $student_id);
-		$this->view('admin/students/update', compact('data'));
+		$this->view('students/edit', compact('data'));
 	}
 
 	public function update()
@@ -239,6 +241,10 @@ class AdminStudentController extends Controller
 
 		switch ($field) {
 			case 'email':
+				$hasRecord = $this->user->findByEmail($value);
+				if(!empty($hasRecord)) {
+					throw new InvalidArgumentException('Email is already registered.');
+				}
 				if (strlen($value) > 100) {
 					throw new InvalidArgumentException("Email cannot exceed 100 characters");
 				}

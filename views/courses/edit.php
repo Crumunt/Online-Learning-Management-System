@@ -28,10 +28,10 @@ $course_diff = $data['difficulty'];
                         </ol>
                     </div>
                     <div class="col-md-4 text-right">
-                        <a href="/instructor/courses/show/<?= $data['id'] ?>"
+                        <button onclick="history.back()"
                             class="btn btn-outline-secondary btn-sm mr-2">
                             <i class="fa fa-arrow-left mr-1"></i>Back to Details
-                        </a>
+                        </button>
                     </div>
                 </div>
             </div>

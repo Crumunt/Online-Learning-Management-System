@@ -244,7 +244,7 @@ class InstructorController extends Controller
                 'id' => $contentId,
                 'contentTitle' => $contentData['title'],
                 'contentData' => htmlspecialchars_decode(stripslashes($contentData['content'])),
-                'file_name' => $contentData['file_path'],
+                'file_name' => $contentData['file_name'],
                 'file_size' => $contentData['file_size'] ?? 0,
                 'status' => $contentData['status']
             ];
